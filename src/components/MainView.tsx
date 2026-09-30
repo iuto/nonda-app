@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Clock, Sparkles, Edit3, RotateCcw, Droplet, Pill, AlertTriangle, Plus, Check } from 'lucide-react';
+import { CheckCircle2, Clock, Sparkles, Edit3, RotateCcw, Pill, AlertTriangle, Plus, Check, Activity } from 'lucide-react';
 import { AppSettings, MedicationLog, BleedingLevel } from '../types/medication';
 import { calculateNextRecommendation, getDeviationStatus } from '../utils/recommendation';
 
@@ -154,23 +154,22 @@ export const MainView: React.FC<MainViewProps> = ({
         )}
       </div>
 
-      {/* 🩸 副作用・出血の程度 ＆ 朝食後の追加薬 カード (文字なし・滴アイコン数のみのミニマルボタン) */}
+      {/* 🌿 体調・副作用の記録 ＆ 朝食後の追加薬 カード (マイルドなドット表現) */}
       <div className="bg-white/90 backdrop-blur-md rounded-3xl p-5 border border-slate-100 shadow-sm space-y-4">
-        {/* ヘッダー */}
+        {/* ヘッダー (マイルドな言葉遣いとアクティビティアイコン) */}
         <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center border border-rose-100">
-            <Droplet className="w-4 h-4 fill-current" />
+          <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100">
+            <Activity className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-xs font-bold text-slate-800">副作用・出血の程度</p>
+            <p className="text-xs font-bold text-slate-800">体調・副作用の記録</p>
           </div>
         </div>
 
-        {/* 文字なし・アイコンのみのスタイリッシュな4択セグメント */}
+        {/* 生々しくないマイルドな抽象ドット選択セグメント */}
         <div className="bg-slate-100/80 p-1 rounded-2xl grid grid-cols-4 gap-1">
           <button
             onClick={() => onSetBleedingLevel('none')}
-            title="なし"
             className={`py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center ${
               currentBleedingLevel === 'none'
                 ? 'bg-white text-slate-800 shadow-xs'
@@ -182,41 +181,38 @@ export const MainView: React.FC<MainViewProps> = ({
 
           <button
             onClick={() => onSetBleedingLevel('light')}
-            title="少量 (1滴)"
-            className={`py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center space-x-0.5 ${
+            className={`py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center space-x-1 ${
               currentBleedingLevel === 'light'
-                ? 'bg-rose-500 text-white shadow-xs'
-                : 'text-rose-600 hover:bg-rose-50/50'
+                ? 'bg-amber-500 text-white shadow-xs'
+                : 'text-amber-700 hover:bg-amber-50/50'
             }`}
           >
-            <Droplet className="w-4 h-4 fill-current" />
+            <span className="w-2 h-2 rounded-full fill-current bg-current"></span>
           </button>
 
           <button
             onClick={() => onSetBleedingLevel('moderate')}
-            title="中程度 (2滴)"
-            className={`py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center space-x-0.5 ${
+            className={`py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center space-x-1 ${
               currentBleedingLevel === 'moderate'
-                ? 'bg-rose-600 text-white shadow-xs'
-                : 'text-rose-700 hover:bg-rose-50/50'
+                ? 'bg-amber-600 text-white shadow-xs'
+                : 'text-amber-800 hover:bg-amber-50/50'
             }`}
           >
-            <Droplet className="w-3.5 h-3.5 fill-current" />
-            <Droplet className="w-3.5 h-3.5 fill-current" />
+            <span className="w-2 h-2 rounded-full bg-current"></span>
+            <span className="w-2 h-2 rounded-full bg-current"></span>
           </button>
 
           <button
             onClick={() => onSetBleedingLevel('heavy')}
-            title="多め (3滴)"
-            className={`py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center space-x-0.5 ${
+            className={`py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center space-x-1 ${
               currentBleedingLevel === 'heavy'
-                ? 'bg-rose-800 text-white shadow-xs'
-                : 'text-rose-800 hover:bg-rose-50/50'
+                ? 'bg-rose-500 text-white shadow-xs'
+                : 'text-rose-700 hover:bg-rose-50/50'
             }`}
           >
-            <Droplet className="w-3 h-3 fill-current" />
-            <Droplet className="w-3 h-3 fill-current" />
-            <Droplet className="w-3 h-3 fill-current" />
+            <span className="w-2 h-2 rounded-full bg-current"></span>
+            <span className="w-2 h-2 rounded-full bg-current"></span>
+            <span className="w-2 h-2 rounded-full bg-current"></span>
           </button>
         </div>
 

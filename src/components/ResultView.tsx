@@ -1,7 +1,7 @@
 import React from 'react';
 import { MedicationLog, AppSettings, BleedingLevel } from '../types/medication';
 import { getDeviationStatus } from '../utils/recommendation';
-import { Calendar, Clock, ArrowLeft, Edit2, Droplet, Pill } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, Edit2, Pill, Activity } from 'lucide-react';
 
 interface ResultViewProps {
   logs: MedicationLog[];
@@ -24,7 +24,6 @@ export const ResultView: React.FC<ResultViewProps> = ({
   let perfectCount = 0;
 
   if (totalTaken > 0) {
-    // ズレを0分基準で判定
     const sumDiff = takenLogs.reduce((sum, l) => sum + Math.abs(l.diffMinutes || 0), 0);
     averageDiffMinutes = Math.round(sumDiff / totalTaken);
     perfectCount = takenLogs.filter((l) => Math.abs(l.diffMinutes || 0) <= 30).length;
@@ -44,11 +43,11 @@ export const ResultView: React.FC<ResultViewProps> = ({
     const activeLevel = level ?? (legacyHasBleeding ? 'light' : 'none');
     switch (activeLevel) {
       case 'light':
-        return { label: '出血: 少量', bgClass: 'bg-rose-100 text-rose-800 border-rose-300' };
+        return { label: '体調: レベル1', bgClass: 'bg-amber-100 text-amber-800 border-amber-300' };
       case 'moderate':
-        return { label: '出血: 中程度', bgClass: 'bg-rose-500 text-white border-rose-600' };
+        return { label: '体調: レベル2', bgClass: 'bg-amber-500 text-white border-amber-600' };
       case 'heavy':
-        return { label: '出血: 多め', bgClass: 'bg-rose-800 text-white border-rose-900' };
+        return { label: '体調: レベル3', bgClass: 'bg-rose-500 text-white border-rose-600' };
       default:
         return null;
     }
@@ -89,12 +88,12 @@ export const ResultView: React.FC<ResultViewProps> = ({
           <p className="text-[10px] md:text-xs text-emerald-600">順調な服薬割合</p>
         </div>
 
-        <div className="bg-rose-50/80 rounded-2xl p-4 text-center space-y-0.5 border border-rose-100">
-          <p className="text-xs font-semibold text-rose-700">出血があった日</p>
-          <p className="text-2xl md:text-3xl font-black text-rose-950">
-            {bleedingDaysCount}<span className="text-xs font-bold text-rose-700">日</span>
+        <div className="bg-amber-50/80 rounded-2xl p-4 text-center space-y-0.5 border border-amber-100">
+          <p className="text-xs font-semibold text-amber-800">症状・体調記録</p>
+          <p className="text-2xl md:text-3xl font-black text-amber-950">
+            {bleedingDaysCount}<span className="text-xs font-bold text-amber-800">日</span>
           </p>
-          <p className="text-[10px] md:text-xs text-rose-600">副作用の記録合計</p>
+          <p className="text-[10px] md:text-xs text-amber-700">副作用等の記録合計</p>
         </div>
       </div>
 
@@ -103,7 +102,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
         <span className="font-semibold text-slate-700">凡例:</span>
         <div className="flex items-center space-x-3 text-xs">
           <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block mr-1.5"></span>時間通り</span>
-          <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block mr-1.5"></span>🩸 出血あり</span>
+          <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block mr-1.5"></span>体調変化記録</span>
           <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-teal-600 inline-block mr-1.5"></span>💊 追加薬あり</span>
         </div>
       </div>
@@ -111,7 +110,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
       {/* 日別ログ＆ズレ可視化リスト */}
       <div className="space-y-3">
         <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">
-          服薬履歴・副作用ログ
+          服薬履歴・体調ログ
         </h3>
 
         {sortedLogs.length === 0 ? (
@@ -130,7 +129,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
                 <div
                   key={log.id}
                   className={`bg-white rounded-2xl p-4 border shadow-xs transition-all space-y-3 ${
-                    bleedingBadge ? 'border-rose-200 ring-1 ring-rose-100' : 'border-slate-100 hover:border-emerald-200'
+                    bleedingBadge ? 'border-amber-200 ring-1 ring-amber-100' : 'border-slate-100 hover:border-emerald-200'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -142,10 +141,9 @@ export const ResultView: React.FC<ResultViewProps> = ({
                     </div>
 
                     <div className="flex items-center space-x-1.5">
-                      {/* 出血3段階バッジ */}
                       {bleedingBadge && (
-                        <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border flex items-center space-x-1 shadow-xs ${bleedingBadge.bgClass}`}>
-                          <Droplet className="w-3 h-3 fill-current" />
+                        <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border flex items-center space-x-1 shadow-xs ${bleedingBadge.bgClass}`}>
+                          <Activity className="w-3 h-3" />
                           <span>{bleedingBadge.label}</span>
                         </span>
                       )}

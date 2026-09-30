@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MedicationLog, BleedingLevel } from '../types/medication';
-import { X, Clock, Check, RotateCcw, Pill, Droplet } from 'lucide-react';
+import { X, Clock, Check, RotateCcw, Pill, Activity } from 'lucide-react';
 
 interface TimeEditModalProps {
   isOpen: boolean;
@@ -74,7 +74,7 @@ export const TimeEditModal: React.FC<TimeEditModalProps> = ({
           <div className="flex items-center space-x-2">
             <Clock className="w-5 h-5 text-emerald-600" />
             <h3 className="font-bold text-base text-slate-800">
-              服薬・副作用の記録
+              服薬・体調の記録
             </h3>
           </div>
           <button
@@ -113,11 +113,14 @@ export const TimeEditModal: React.FC<TimeEditModalProps> = ({
             </button>
           </div>
 
-          {/* 出血の程度選択 (文字なし) */}
+          {/* 体調・副作用の程度 (マイルドなドット表示) */}
           <div className="pt-2 border-t border-slate-100 space-y-1.5">
-            <label className="block text-xs font-bold text-slate-700">
-              出血の症状の程度
-            </label>
+            <div className="flex items-center space-x-1.5">
+              <Activity className="w-3.5 h-3.5 text-amber-600" />
+              <label className="block text-xs font-bold text-slate-700">
+                体調・副作用の程度
+              </label>
+            </div>
             <div className="grid grid-cols-4 gap-1">
               <button
                 type="button"
@@ -133,38 +136,38 @@ export const TimeEditModal: React.FC<TimeEditModalProps> = ({
               <button
                 type="button"
                 onClick={() => setBleedingLevel('light')}
-                className={`py-2 rounded-xl text-xs font-bold border flex items-center justify-center ${
+                className={`py-2 rounded-xl text-xs font-bold border flex items-center justify-center space-x-1 ${
                   bleedingLevel === 'light'
-                    ? 'bg-rose-500 text-white border-rose-600'
-                    : 'bg-rose-50 text-rose-700 border-rose-200'
+                    ? 'bg-amber-500 text-white border-amber-600'
+                    : 'bg-amber-50 text-amber-700 border-amber-200'
                 }`}
               >
-                <Droplet className="w-4 h-4 fill-current" />
+                <span className="w-2 h-2 rounded-full bg-current"></span>
               </button>
               <button
                 type="button"
                 onClick={() => setBleedingLevel('moderate')}
-                className={`py-2 rounded-xl text-xs font-bold border flex items-center justify-center space-x-0.5 ${
+                className={`py-2 rounded-xl text-xs font-bold border flex items-center justify-center space-x-1 ${
                   bleedingLevel === 'moderate'
-                    ? 'bg-rose-600 text-white border-rose-700'
-                    : 'bg-rose-100 text-rose-800 border-rose-300'
+                    ? 'bg-amber-600 text-white border-amber-700'
+                    : 'bg-amber-100 text-amber-800 border-amber-300'
                 }`}
               >
-                <Droplet className="w-3.5 h-3.5 fill-current" />
-                <Droplet className="w-3.5 h-3.5 fill-current" />
+                <span className="w-2 h-2 rounded-full bg-current"></span>
+                <span className="w-2 h-2 rounded-full bg-current"></span>
               </button>
               <button
                 type="button"
                 onClick={() => setBleedingLevel('heavy')}
-                className={`py-2 rounded-xl text-xs font-bold border flex items-center justify-center space-x-0.5 ${
+                className={`py-2 rounded-xl text-xs font-bold border flex items-center justify-center space-x-1 ${
                   bleedingLevel === 'heavy'
-                    ? 'bg-rose-800 text-white border-rose-900'
-                    : 'bg-rose-200 text-rose-900 border-rose-400'
+                    ? 'bg-rose-500 text-white border-rose-600'
+                    : 'bg-rose-100 text-rose-800 border-rose-200'
                 }`}
               >
-                <Droplet className="w-3 h-3 fill-current" />
-                <Droplet className="w-3 h-3 fill-current" />
-                <Droplet className="w-3 h-3 fill-current" />
+                <span className="w-2 h-2 rounded-full bg-current"></span>
+                <span className="w-2 h-2 rounded-full bg-current"></span>
+                <span className="w-2 h-2 rounded-full bg-current"></span>
               </button>
             </div>
           </div>
