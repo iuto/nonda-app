@@ -31,6 +31,10 @@ export const MainView: React.FC<MainViewProps> = ({
 }) => {
   const [isEditingPills, setIsEditingPills] = useState(false);
   const [inputPills, setInputPills] = useState(String(settings.remainingPills));
+  
+  // 自由追加用ステート
+  const [customAddCount, setCustomAddCount] = useState('30');
+  const [isCustomAdding, setIsCustomAdding] = useState(false);
 
   const today = new Date();
   const dateFormatted = today.toLocaleDateString('ja-JP', {
@@ -59,6 +63,14 @@ export const MainView: React.FC<MainViewProps> = ({
 
   const handleAddQuickPills = (addCount: number) => {
     onSetRemainingPills(settings.remainingPills + addCount);
+  };
+
+  const handleCustomAddPills = () => {
+    const val = parseInt(customAddCount, 10);
+    if (!isNaN(val) && val > 0) {
+      onSetRemainingPills(settings.remainingPills + val);
+    }
+    setIsCustomAdding(false);
   };
 
   return (
@@ -154,9 +166,8 @@ export const MainView: React.FC<MainViewProps> = ({
         )}
       </div>
 
-      {/* 🌿 体調・副作用の記録 ＆ 朝食後の追加薬 カード (マイルドなドット表現) */}
+      {/* 🌿 体調・副作用の記録 ＆ 朝食後の追加薬 カード */}
       <div className="bg-white/90 backdrop-blur-md rounded-3xl p-5 border border-slate-100 shadow-sm space-y-4">
-        {/* ヘッダー (マイルドな言葉遣いとアクティビティアイコン) */}
         <div className="flex items-center space-x-2.5">
           <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100">
             <Activity className="w-4 h-4" />
@@ -166,7 +177,6 @@ export const MainView: React.FC<MainViewProps> = ({
           </div>
         </div>
 
-        {/* 生々しくないマイルドな抽象ドット選択セグメント */}
         <div className="bg-slate-100/80 p-1 rounded-2xl grid grid-cols-4 gap-1">
           <button
             onClick={() => onSetBleedingLevel('none')}
@@ -249,7 +259,7 @@ export const MainView: React.FC<MainViewProps> = ({
         </div>
       </div>
 
-      {/* 💊 薬の残数管理・補充カード */}
+      {/* 💊 薬の残数管理・補充カード (自由に自由な個数を＋追加可能) */}
       <div className="bg-white/90 backdrop-blur-md rounded-3xl p-5 border border-slate-100 shadow-sm space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2.5">
@@ -297,21 +307,52 @@ export const MainView: React.FC<MainViewProps> = ({
           )}
         </div>
 
+        {/* 自由個数追加 ＆ 30個ワンタップ追加 */}
         <div className="pt-2 border-t border-slate-100 flex items-center justify-end space-x-2">
-          <button
-            onClick={() => handleAddQuickPills(30)}
-            className="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold border border-emerald-200 transition-all shadow-xs flex items-center space-x-1 text-xs"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>+30個追加</span>
-          </button>
-          <button
-            onClick={() => handleAddQuickPills(60)}
-            className="px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold transition-all border border-slate-200 flex items-center space-x-1 text-xs"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>+60個追加</span>
-          </button>
+          {!isCustomAdding ? (
+            <>
+              <button
+                onClick={() => handleAddQuickPills(30)}
+                className="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold border border-emerald-200 transition-all shadow-xs flex items-center space-x-1 text-xs"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>+30個追加</span>
+              </button>
+              <button
+                onClick={() => setIsCustomAdding(true)}
+                className="px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold transition-all border border-slate-200 flex items-center space-x-1 text-xs"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>自由な個数を追加</span>
+              </button>
+            </>
+          ) : (
+            <div className="flex items-center space-x-1.5 animate-in fade-in">
+              <span className="text-xs font-bold text-slate-600">+</span>
+              <input
+                type="number"
+                value={customAddCount}
+                onChange={(e) => setCustomAddCount(e.target.value)}
+                className="w-16 px-2 py-1 text-center font-bold text-sm rounded-xl border border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                placeholder="個数"
+                min="1"
+                autoFocus
+              />
+              <span className="text-xs text-slate-600">個</span>
+              <button
+                onClick={handleCustomAddPills}
+                className="px-3 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs"
+              >
+                追加
+              </button>
+              <button
+                onClick={() => setIsCustomAdding(false)}
+                className="text-xs text-slate-400 hover:text-slate-600 px-1"
+              >
+                キャンセル
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
