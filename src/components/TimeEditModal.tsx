@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { MedicationLog } from '../types/medication';
-import { X, Clock, Check, RotateCcw, Droplet, Pill } from 'lucide-react';
+import { MedicationLog, BleedingLevel } from '../types/medication';
+import { X, Clock, Check, RotateCcw, Pill } from 'lucide-react';
 
 interface TimeEditModalProps {
   isOpen: boolean;
@@ -9,7 +9,7 @@ interface TimeEditModalProps {
   onSave: (
     date: string,
     takenTime: string | null,
-    hasBleeding?: boolean,
+    bleedingLevel?: BleedingLevel,
     extraTakenTime?: string | null
   ) => void;
 }
@@ -21,7 +21,7 @@ export const TimeEditModal: React.FC<TimeEditModalProps> = ({
   onSave,
 }) => {
   const [time, setTime] = useState<string>('08:00');
-  const [hasBleeding, setHasBleeding] = useState<boolean>(false);
+  const [bleedingLevel, setBleedingLevel] = useState<BleedingLevel>('none');
   const [extraTime, setExtraTime] = useState<string>('');
   const [isExtraEnabled, setIsExtraEnabled] = useState<boolean>(false);
 
@@ -35,7 +35,7 @@ export const TimeEditModal: React.FC<TimeEditModalProps> = ({
         const mm = String(now.getMinutes()).padStart(2, '0');
         setTime(`${hh}:${mm}`);
       }
-      setHasBleeding(!!log.hasBleeding);
+      setBleedingLevel(log.bleedingLevel ?? (log.hasBleeding ? 'light' : 'none'));
       if (log.extraTakenTime) {
         setExtraTime(log.extraTakenTime);
         setIsExtraEnabled(true);
@@ -57,12 +57,12 @@ export const TimeEditModal: React.FC<TimeEditModalProps> = ({
 
   const handleSave = () => {
     const finalExtraTime = isExtraEnabled ? extraTime : null;
-    onSave(log.date, time, hasBleeding, finalExtraTime);
+    onSave(log.date, time, bleedingLevel, finalExtraTime);
     onClose();
   };
 
   const handleReset = () => {
-    onSave(log.date, null, hasBleeding, null);
+    onSave(log.date, null, bleedingLevel, null);
     onClose();
   };
 
@@ -113,20 +113,57 @@ export const TimeEditModal: React.FC<TimeEditModalProps> = ({
             </button>
           </div>
 
-          {/* 出血チェックボックス */}
-          <div className="pt-2 border-t border-slate-100">
-            <label className="flex items-center space-x-2.5 cursor-pointer p-2.5 rounded-xl bg-rose-50/60 border border-rose-100 hover:bg-rose-50 transition-colors">
-              <input
-                type="checkbox"
-                checked={hasBleeding}
-                onChange={(e) => setHasBleeding(e.target.checked)}
-                className="w-4 h-4 rounded text-rose-500 focus:ring-rose-400 border-slate-300"
-              />
-              <Droplet className="w-4 h-4 text-rose-500 fill-current" />
-              <span className="text-xs font-bold text-slate-800">
-                この日、出血の症状があった
-              </span>
+          {/* 出血の程度 3段階選択 */}
+          <div className="pt-2 border-t border-slate-100 space-y-1.5">
+            <label className="block text-xs font-bold text-slate-700">
+              出血の症状の程度
             </label>
+            <div className="grid grid-cols-4 gap-1">
+              <button
+                type="button"
+                onClick={() => setBleedingLevel('none')}
+                className={`py-1.5 px-1 rounded-xl text-xs font-bold border ${
+                  bleedingLevel === 'none'
+                    ? 'bg-slate-700 text-white border-slate-800'
+                    : 'bg-slate-50 text-slate-600 border-slate-200'
+                }`}
+              >
+                なし
+              </button>
+              <button
+                type="button"
+                onClick={() => setBleedingLevel('light')}
+                className={`py-1.5 px-1 rounded-xl text-xs font-bold border ${
+                  bleedingLevel === 'light'
+                    ? 'bg-rose-500 text-white border-rose-600'
+                    : 'bg-rose-50 text-rose-700 border-rose-200'
+                }`}
+              >
+                少量
+              </button>
+              <button
+                type="button"
+                onClick={() => setBleedingLevel('moderate')}
+                className={`py-1.5 px-1 rounded-xl text-xs font-bold border ${
+                  bleedingLevel === 'moderate'
+                    ? 'bg-rose-600 text-white border-rose-700'
+                    : 'bg-rose-100 text-rose-800 border-rose-300'
+                }`}
+              >
+                中程度
+              </button>
+              <button
+                type="button"
+                onClick={() => setBleedingLevel('heavy')}
+                className={`py-1.5 px-1 rounded-xl text-xs font-bold border ${
+                  bleedingLevel === 'heavy'
+                    ? 'bg-rose-800 text-white border-rose-900'
+                    : 'bg-rose-200 text-rose-900 border-rose-400'
+                }`}
+              >
+                多め
+              </button>
+            </div>
           </div>
 
           {/* 朝食後の追加薬設定 */}

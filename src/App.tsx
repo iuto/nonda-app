@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AppSettings, MedicationLog } from './types/medication';
+import { AppSettings, MedicationLog, BleedingLevel } from './types/medication';
 import {
   loadLogs,
   loadSettings,
@@ -34,7 +34,6 @@ export function App() {
     }
   }, [todayDateStr, logs, todayLog]);
 
-  // 残数更新ヘルパー
   const updatePills = (delta: number) => {
     const newCount = Math.max(0, settings.remainingPills + delta);
     const newSettings = { ...settings, remainingPills: newCount };
@@ -42,7 +41,6 @@ export function App() {
     saveSettings(newSettings);
   };
 
-  // 服薬「飲んだ！」アクション（残数 -1）
   const handleTakeNow = () => {
     const now = new Date();
     const hh = String(now.getHours()).padStart(2, '0');
@@ -62,13 +60,11 @@ export function App() {
     setLogs(newLogs);
     saveLogs(newLogs);
 
-    // 未服用から服用済みになった場合のみ残数を-1
     if (!todayLog.takenTime) {
       updatePills(-1);
     }
   };
 
-  // 服用を取り消す（残数 +1）
   const handleCancelTake = () => {
     if (todayLog.takenTime) {
       updatePills(1);
@@ -86,12 +82,13 @@ export function App() {
     saveLogs(newLogs);
   };
 
-  // 副作用：出血のトグル切り替え
-  const handleToggleBleeding = (dateStr: string) => {
+  // 副作用：出血の3段階程度を設定
+  const handleSetBleedingLevel = (dateStr: string, level: BleedingLevel) => {
     const targetLog = logs.find((l) => l.date === dateStr) || getOrCreateLogForDate(dateStr, settings.targetTime, logs);
     const updatedLog: MedicationLog = {
       ...targetLog,
-      hasBleeding: !targetLog.hasBleeding,
+      bleedingLevel: level,
+      hasBleeding: level !== 'none',
     };
 
     const exists = logs.some((l) => l.date === dateStr);
@@ -103,7 +100,6 @@ export function App() {
     saveLogs(newLogs);
   };
 
-  // 朝食後の追加薬「飲んだ！」アクション（残数 -1）
   const handleTakeExtra = (dateStr: string) => {
     const now = new Date();
     const hh = String(now.getHours()).padStart(2, '0');
@@ -131,7 +127,6 @@ export function App() {
     saveLogs(newLogs);
   };
 
-  // 朝食後の追加薬の取り消し（残数 +1）
   const handleCancelTakeExtra = (dateStr: string) => {
     const targetLog = logs.find((l) => l.date === dateStr) || getOrCreateLogForDate(dateStr, settings.targetTime, logs);
     
@@ -154,7 +149,6 @@ export function App() {
     saveLogs(newLogs);
   };
 
-  // 手動で残数を補充・編集
   const handleSetRemainingPills = (count: number) => {
     const newSettings = { ...settings, remainingPills: Math.max(0, count) };
     setSettings(newSettings);
@@ -164,12 +158,14 @@ export function App() {
   const handleSaveTime = (
     dateStr: string,
     takenTime: string | null,
-    hasBleeding?: boolean,
+    bleedingLevel?: BleedingLevel,
     extraTakenTime?: string | null
   ) => {
     const targetLog = logs.find((l) => l.date === dateStr) || getOrCreateLogForDate(dateStr, settings.targetTime, logs);
 
     let updatedLog: MedicationLog;
+
+    const finalLevel = bleedingLevel ?? targetLog.bleedingLevel ?? (targetLog.hasBleeding ? 'light' : 'none');
 
     if (takenTime === null) {
       updatedLog = {
@@ -177,7 +173,8 @@ export function App() {
         takenTime: null,
         takenAt: null,
         diffMinutes: null,
-        hasBleeding: hasBleeding ?? targetLog.hasBleeding,
+        bleedingLevel: finalLevel,
+        hasBleeding: finalLevel !== 'none',
         extraTakenTime: extraTakenTime !== undefined ? extraTakenTime : targetLog.extraTakenTime,
       };
     } else {
@@ -187,7 +184,8 @@ export function App() {
         takenTime: takenTime,
         takenAt: new Date().toISOString(),
         diffMinutes: diff,
-        hasBleeding: hasBleeding ?? targetLog.hasBleeding,
+        bleedingLevel: finalLevel,
+        hasBleeding: finalLevel !== 'none',
         extraTakenTime: extraTakenTime !== undefined ? extraTakenTime : targetLog.extraTakenTime,
       };
     }
@@ -221,7 +219,7 @@ export function App() {
             settings={settings}
             onTakeNow={handleTakeNow}
             onCancelTake={handleCancelTake}
-            onToggleBleeding={() => handleToggleBleeding(todayDateStr)}
+            onSetBleedingLevel={(level) => handleSetBleedingLevel(todayDateStr, level)}
             onTakeExtra={() => handleTakeExtra(todayDateStr)}
             onCancelTakeExtra={() => handleCancelTakeExtra(todayDateStr)}
             onSetRemainingPills={handleSetRemainingPills}

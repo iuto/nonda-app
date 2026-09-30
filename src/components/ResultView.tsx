@@ -1,5 +1,5 @@
 import React from 'react';
-import { MedicationLog, AppSettings } from '../types/medication';
+import { MedicationLog, AppSettings, BleedingLevel } from '../types/medication';
 import { getDeviationStatus } from '../utils/recommendation';
 import { Calendar, Clock, ArrowLeft, Edit2, Droplet, Pill } from 'lucide-react';
 
@@ -30,13 +30,27 @@ export const ResultView: React.FC<ResultViewProps> = ({
   }
 
   const perfectRate = totalTaken > 0 ? Math.round((perfectCount / totalTaken) * 100) : 0;
-  const bleedingDaysCount = logs.filter((l) => l.hasBleeding).length;
+  const bleedingDaysCount = logs.filter((l) => l.bleedingLevel && l.bleedingLevel !== 'none' || l.hasBleeding).length;
 
   const formatDateLabel = (dateStr: string) => {
     const [y, m, d] = dateStr.split('-');
     const dateObj = new Date(Number(y), Number(m) - 1, Number(d));
     const dayOfWeek = ['日', '月', '火', '水', '木', '金', '土'][dateObj.getDay()];
     return `${Number(m)}/${Number(d)} (${dayOfWeek})`;
+  };
+
+  const getBleedingBadge = (level: BleedingLevel | undefined, legacyHasBleeding?: boolean) => {
+    const activeLevel = level ?? (legacyHasBleeding ? 'light' : 'none');
+    switch (activeLevel) {
+      case 'light':
+        return { label: '出血: 少量', bgClass: 'bg-rose-100 text-rose-800 border-rose-300' };
+      case 'moderate':
+        return { label: '出血: 中程度', bgClass: 'bg-rose-500 text-white border-rose-600' };
+      case 'heavy':
+        return { label: '出血: 多め', bgClass: 'bg-rose-800 text-white border-rose-900' };
+      default:
+        return null;
+    }
   };
 
   return (
@@ -88,7 +102,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
         <span className="font-semibold text-slate-700">凡例:</span>
         <div className="flex items-center space-x-3 text-xs">
           <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block mr-1.5"></span>時間通り</span>
-          <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block mr-1.5"></span>🩸 出血あり</span>
+          <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block mr-1.5"></span>🩸 出血あり(3段階)</span>
           <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-teal-600 inline-block mr-1.5"></span>💊 追加薬あり</span>
         </div>
       </div>
@@ -111,14 +125,14 @@ export const ResultView: React.FC<ResultViewProps> = ({
               const diff = log.diffMinutes || 0;
               const absDiff = Math.abs(diff);
               const barWidthPercent = isTaken ? Math.min(100, Math.max(8, (absDiff / 120) * 100)) : 0;
-              const hasBleeding = !!log.hasBleeding;
+              const bleedingBadge = getBleedingBadge(log.bleedingLevel, log.hasBleeding);
               const isExtraTaken = !!log.extraTakenTime;
 
               return (
                 <div
                   key={log.id}
                   className={`bg-white rounded-2xl p-4 border shadow-xs transition-all space-y-3 ${
-                    hasBleeding ? 'border-rose-200 ring-1 ring-rose-100' : 'border-slate-100 hover:border-emerald-200'
+                    bleedingBadge ? 'border-rose-200 ring-1 ring-rose-100' : 'border-slate-100 hover:border-emerald-200'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -130,11 +144,11 @@ export const ResultView: React.FC<ResultViewProps> = ({
                     </div>
 
                     <div className="flex items-center space-x-1.5">
-                      {/* 出血ありバッジ */}
-                      {hasBleeding && (
-                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-500 text-white flex items-center space-x-1 shadow-xs">
+                      {/* 出血3段階バッジ */}
+                      {bleedingBadge && (
+                        <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full border flex items-center space-x-1 shadow-xs ${bleedingBadge.bgClass}`}>
                           <Droplet className="w-3 h-3 fill-current" />
-                          <span>出血</span>
+                          <span>{bleedingBadge.label}</span>
                         </span>
                       )}
 
@@ -166,7 +180,6 @@ export const ResultView: React.FC<ResultViewProps> = ({
                       </div>
                     </div>
 
-                    {/* 追加薬の服用状況 */}
                     {isExtraTaken && (
                       <div className="pt-1 border-t border-slate-200/60 flex items-center justify-between text-emerald-800 font-semibold">
                         <span className="flex items-center space-x-1">
