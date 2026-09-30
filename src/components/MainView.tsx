@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Clock, Sparkles, Edit3, RotateCcw, Pill, AlertTriangle, Plus, Check, Activity } from 'lucide-react';
+import { CheckCircle2, Clock, Edit3, RotateCcw, Pill, AlertTriangle, Plus, Check, Activity } from 'lucide-react';
 import { AppSettings, MedicationLog, BleedingLevel } from '../types/medication';
-import { calculateNextRecommendation, getDeviationStatus } from '../utils/recommendation';
+import { getDeviationStatus } from '../utils/recommendation';
 
 interface MainViewProps {
   logs: MedicationLog[];
@@ -18,7 +18,6 @@ interface MainViewProps {
 }
 
 export const MainView: React.FC<MainViewProps> = ({
-  logs,
   todayLog,
   settings,
   onTakeNow,
@@ -46,7 +45,6 @@ export const MainView: React.FC<MainViewProps> = ({
 
   const isTaken = !!todayLog.takenTime;
   const deviation = isTaken ? getDeviationStatus(todayLog.diffMinutes) : null;
-  const recommendation = calculateNextRecommendation(logs, todayLog, settings.targetTime);
   
   const currentBleedingLevel: BleedingLevel = todayLog.bleedingLevel ?? (todayLog.hasBleeding ? 'light' : 'none');
   const isExtraTaken = !!todayLog.extraTakenTime;
@@ -352,28 +350,6 @@ export const MainView: React.FC<MainViewProps> = ({
                 キャンセル
               </button>
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* 明日は何時頃飲んだほうがいい？ */}
-      <div className="bg-white/80 backdrop-blur-md rounded-2xl p-4 border border-slate-100 text-slate-700 shadow-xs flex items-center justify-between px-5">
-        <div className="flex items-center space-x-2 text-xs font-medium text-slate-600">
-          <Sparkles className="w-4 h-4 text-emerald-600" />
-          <span>明日の目安時間</span>
-        </div>
-        <div>
-          {recommendation.hasData && recommendation.recommendedTime ? (
-            <div className="flex items-baseline space-x-1">
-              <span className="text-xl font-bold text-emerald-900">
-                {recommendation.recommendedTime}
-              </span>
-              <span className="text-xs text-slate-500">頃</span>
-            </div>
-          ) : (
-            <span className="text-xs font-medium text-slate-400 bg-slate-100/80 px-3 py-1 rounded-full">
-              データがないため表示できません
-            </span>
           )}
         </div>
       </div>
