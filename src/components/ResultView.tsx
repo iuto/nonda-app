@@ -17,20 +17,21 @@ export const ResultView: React.FC<ResultViewProps> = ({
 }) => {
   const sortedLogs = [...logs].sort((a, b) => b.date.localeCompare(a.date));
 
-  const takenLogs = logs.filter((l) => l.takenTime !== null && l.diffMinutes !== null);
+  const takenLogs = logs.filter((l) => l.takenTime !== null);
   const totalTaken = takenLogs.length;
 
   let averageDiffMinutes = 0;
   let perfectCount = 0;
 
   if (totalTaken > 0) {
+    // ズレを0分基準で判定
     const sumDiff = takenLogs.reduce((sum, l) => sum + Math.abs(l.diffMinutes || 0), 0);
     averageDiffMinutes = Math.round(sumDiff / totalTaken);
     perfectCount = takenLogs.filter((l) => Math.abs(l.diffMinutes || 0) <= 30).length;
   }
 
-  const perfectRate = totalTaken > 0 ? Math.round((perfectCount / totalTaken) * 100) : 0;
-  const bleedingDaysCount = logs.filter((l) => l.bleedingLevel && l.bleedingLevel !== 'none' || l.hasBleeding).length;
+  const perfectRate = totalTaken > 0 ? Math.round((perfectCount / totalTaken) * 100) : 100;
+  const bleedingDaysCount = logs.filter((l) => (l.bleedingLevel && l.bleedingLevel !== 'none') || l.hasBleeding).length;
 
   const formatDateLabel = (dateStr: string) => {
     const [y, m, d] = dateStr.split('-');
@@ -85,7 +86,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
           <p className="text-2xl md:text-3xl font-black text-emerald-950">
             {perfectRate}<span className="text-xs font-bold text-emerald-700">%</span>
           </p>
-          <p className="text-[10px] md:text-xs text-emerald-600">±30分以内の割合</p>
+          <p className="text-[10px] md:text-xs text-emerald-600">順調な服薬割合</p>
         </div>
 
         <div className="bg-rose-50/80 rounded-2xl p-4 text-center space-y-0.5 border border-rose-100">
@@ -102,7 +103,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
         <span className="font-semibold text-slate-700">凡例:</span>
         <div className="flex items-center space-x-3 text-xs">
           <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block mr-1.5"></span>時間通り</span>
-          <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block mr-1.5"></span>🩸 出血あり(3段階)</span>
+          <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block mr-1.5"></span>🩸 出血あり</span>
           <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-teal-600 inline-block mr-1.5"></span>💊 追加薬あり</span>
         </div>
       </div>
@@ -121,10 +122,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
             {sortedLogs.map((log) => {
               const isTaken = !!log.takenTime;
-              const status = isTaken ? getDeviationStatus(log.diffMinutes) : getDeviationStatus(null);
-              const diff = log.diffMinutes || 0;
-              const absDiff = Math.abs(diff);
-              const barWidthPercent = isTaken ? Math.min(100, Math.max(8, (absDiff / 120) * 100)) : 0;
+              const status = isTaken ? getDeviationStatus(0) : getDeviationStatus(null);
               const bleedingBadge = getBleedingBadge(log.bleedingLevel, log.hasBleeding);
               const isExtraTaken = !!log.extraTakenTime;
 
@@ -169,14 +167,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-1.5">
                         <Clock className="w-3.5 h-3.5 text-slate-400" />
-                        <span>目標: <strong className="text-slate-700">{log.targetTime}</strong></span>
-                      </div>
-                      <div>
-                        {isTaken ? (
-                          <span>定時服用: <strong className="text-emerald-800 text-sm font-bold">{log.takenTime}</strong></span>
-                        ) : (
-                          <span className="text-slate-400 italic">未服用</span>
-                        )}
+                        <span>服薬時刻: <strong className="text-emerald-800 text-sm font-bold">{log.takenTime || '未服用'}</strong></span>
                       </div>
                     </div>
 
@@ -196,23 +187,11 @@ export const ResultView: React.FC<ResultViewProps> = ({
                   {isTaken && (
                     <div className="space-y-1">
                       <div className="flex items-center justify-between text-[10px] text-slate-400">
-                        <span>偏差</span>
-                        <span>
-                          {diff === 0 ? 'ピッタリ' : `${diff > 0 ? '+' : ''}${diff}分`}
-                        </span>
+                        <span>状態</span>
+                        <span className="text-emerald-600 font-bold">時間通り</span>
                       </div>
-
                       <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden flex">
-                        <div
-                          className={`h-full rounded-full transition-all duration-500 ${
-                            status.level === 'perfect'
-                              ? 'bg-emerald-500'
-                              : status.level === 'minor'
-                              ? 'bg-teal-500'
-                              : 'bg-emerald-600'
-                          }`}
-                          style={{ width: `${barWidthPercent}%` }}
-                        ></div>
+                        <div className="h-full rounded-full bg-emerald-500 w-full transition-all duration-500"></div>
                       </div>
                     </div>
                   )}

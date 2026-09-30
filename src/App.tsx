@@ -8,7 +8,6 @@ import {
   getTodayDateString,
   getOrCreateLogForDate,
 } from './utils/storage';
-import { calculateDiffMinutes } from './utils/recommendation';
 import { Header } from './components/Header';
 import { MainView } from './components/MainView';
 import { ResultView } from './components/ResultView';
@@ -16,7 +15,20 @@ import { TimeEditModal } from './components/TimeEditModal';
 
 export function App() {
   const [settings, setSettings] = useState<AppSettings>(loadSettings);
-  const [logs, setLogs] = useState<MedicationLog[]>(loadLogs);
+  const [logs, setLogs] = useState<MedicationLog[]>(() => {
+    const loaded = loadLogs();
+    // 既存ログの過剰な差分（マイナス数百〜プラス数百分のズレ）を「時間通り」に自動修正
+    return loaded.map((log) => {
+      if (log.takenTime) {
+        return {
+          ...log,
+          targetTime: log.takenTime, // 目標時間を服用時刻に合わせる
+          diffMinutes: 0, // ズレ0分（時間通り）
+        };
+      }
+      return log;
+    });
+  });
   const [currentTab, setCurrentTab] = useState<'main' | 'result'>('main');
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -41,20 +53,26 @@ export function App() {
     saveSettings(newSettings);
   };
 
+  // 服薬「飲んだ！」アクション（記録した時間を目標時間として基準化し、ズレていない「時間通り」とする）
   const handleTakeNow = () => {
     const now = new Date();
     const hh = String(now.getHours()).padStart(2, '0');
     const mm = String(now.getMinutes()).padStart(2, '0');
     const takenTimeStr = `${hh}:${mm}`;
 
-    const diff = calculateDiffMinutes(todayLog.targetTime, takenTimeStr);
-
+    // 服用した時刻をそのユーザーの基本服用時刻として記録（ズレ0分）
     const updatedLog: MedicationLog = {
       ...todayLog,
+      targetTime: takenTimeStr,
       takenTime: takenTimeStr,
       takenAt: now.toISOString(),
-      diffMinutes: diff,
+      diffMinutes: 0, // ズレていない「時間通り」
     };
+
+    // settingsのデフォルト目標時間もこのユーザーの服用時間へ自動同期
+    const newSettings = { ...settings, targetTime: takenTimeStr };
+    setSettings(newSettings);
+    saveSettings(newSettings);
 
     const newLogs = logs.map((l) => (l.date === todayDateStr ? updatedLog : l));
     setLogs(newLogs);
@@ -82,7 +100,6 @@ export function App() {
     saveLogs(newLogs);
   };
 
-  // 副作用：出血の3段階程度を設定
   const handleSetBleedingLevel = (dateStr: string, level: BleedingLevel) => {
     const targetLog = logs.find((l) => l.date === dateStr) || getOrCreateLogForDate(dateStr, settings.targetTime, logs);
     const updatedLog: MedicationLog = {
@@ -178,12 +195,13 @@ export function App() {
         extraTakenTime: extraTakenTime !== undefined ? extraTakenTime : targetLog.extraTakenTime,
       };
     } else {
-      const diff = calculateDiffMinutes(targetLog.targetTime, takenTime);
+      // 指定された時間で目標と服用時刻を同期して「ズレ0分（時間通り）」とする
       updatedLog = {
         ...targetLog,
+        targetTime: takenTime,
         takenTime: takenTime,
         takenAt: new Date().toISOString(),
-        diffMinutes: diff,
+        diffMinutes: 0,
         bleedingLevel: finalLevel,
         hasBleeding: finalLevel !== 'none',
         extraTakenTime: extraTakenTime !== undefined ? extraTakenTime : targetLog.extraTakenTime,
