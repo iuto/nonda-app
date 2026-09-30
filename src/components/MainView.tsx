@@ -73,7 +73,7 @@ export const MainView: React.FC<MainViewProps> = ({
         </div>
       )}
 
-      {/* 今日の日付 (「目標 08:00」を削除し日付のみのシンプル表示) */}
+      {/* 今日の日付 */}
       <div className="text-center">
         <div className="inline-flex items-center px-4 py-1 rounded-full bg-emerald-100/70 text-emerald-800 text-xs font-semibold border border-emerald-200/50">
           <span>{dateFormatted}</span>
@@ -154,8 +154,9 @@ export const MainView: React.FC<MainViewProps> = ({
         )}
       </div>
 
-      {/* 🩸 副作用・出血の程度 ＆ 朝食後の追加薬 カード */}
+      {/* 🩸 副作用・出血の程度 ＆ 朝食後の追加薬 カード (文字なし・滴アイコン数のみのミニマルボタン) */}
       <div className="bg-white/90 backdrop-blur-md rounded-3xl p-5 border border-slate-100 shadow-sm space-y-4">
+        {/* ヘッダー */}
         <div className="flex items-center space-x-2.5">
           <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center border border-rose-100">
             <Droplet className="w-4 h-4 fill-current" />
@@ -165,10 +166,12 @@ export const MainView: React.FC<MainViewProps> = ({
           </div>
         </div>
 
+        {/* 文字なし・アイコンのみのスタイリッシュな4択セグメント */}
         <div className="bg-slate-100/80 p-1 rounded-2xl grid grid-cols-4 gap-1">
           <button
             onClick={() => onSetBleedingLevel('none')}
-            className={`py-2 rounded-xl text-xs font-bold transition-all duration-200 ${
+            title="なし"
+            className={`py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center ${
               currentBleedingLevel === 'none'
                 ? 'bg-white text-slate-800 shadow-xs'
                 : 'text-slate-500 hover:text-slate-700'
@@ -179,30 +182,32 @@ export const MainView: React.FC<MainViewProps> = ({
 
           <button
             onClick={() => onSetBleedingLevel('light')}
-            className={`py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center space-x-1 ${
+            title="少量 (1滴)"
+            className={`py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center space-x-0.5 ${
               currentBleedingLevel === 'light'
                 ? 'bg-rose-500 text-white shadow-xs'
                 : 'text-rose-600 hover:bg-rose-50/50'
             }`}
           >
-            <Droplet className="w-3 h-3 fill-current" />
-            <span>少量</span>
+            <Droplet className="w-4 h-4 fill-current" />
           </button>
 
           <button
             onClick={() => onSetBleedingLevel('moderate')}
+            title="中程度 (2滴)"
             className={`py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center space-x-0.5 ${
               currentBleedingLevel === 'moderate'
                 ? 'bg-rose-600 text-white shadow-xs'
                 : 'text-rose-700 hover:bg-rose-50/50'
             }`}
           >
-            <Droplet className="w-3 h-3 fill-current" />
-            <span>中程度</span>
+            <Droplet className="w-3.5 h-3.5 fill-current" />
+            <Droplet className="w-3.5 h-3.5 fill-current" />
           </button>
 
           <button
             onClick={() => onSetBleedingLevel('heavy')}
+            title="多め (3滴)"
             className={`py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center space-x-0.5 ${
               currentBleedingLevel === 'heavy'
                 ? 'bg-rose-800 text-white shadow-xs'
@@ -210,10 +215,12 @@ export const MainView: React.FC<MainViewProps> = ({
             }`}
           >
             <Droplet className="w-3 h-3 fill-current" />
-            <span>多め</span>
+            <Droplet className="w-3 h-3 fill-current" />
+            <Droplet className="w-3 h-3 fill-current" />
           </button>
         </div>
 
+        {/* 朝食後の追加薬エリア */}
         <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
           <div className="flex items-center space-x-2.5">
             <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">

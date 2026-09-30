@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MedicationLog, BleedingLevel } from '../types/medication';
-import { X, Clock, Check, RotateCcw, Pill } from 'lucide-react';
+import { X, Clock, Check, RotateCcw, Pill, Droplet } from 'lucide-react';
 
 interface TimeEditModalProps {
   isOpen: boolean;
@@ -113,7 +113,7 @@ export const TimeEditModal: React.FC<TimeEditModalProps> = ({
             </button>
           </div>
 
-          {/* 出血の程度 3段階選択 */}
+          {/* 出血の程度選択 (文字なし) */}
           <div className="pt-2 border-t border-slate-100 space-y-1.5">
             <label className="block text-xs font-bold text-slate-700">
               出血の症状の程度
@@ -122,7 +122,7 @@ export const TimeEditModal: React.FC<TimeEditModalProps> = ({
               <button
                 type="button"
                 onClick={() => setBleedingLevel('none')}
-                className={`py-1.5 px-1 rounded-xl text-xs font-bold border ${
+                className={`py-2 rounded-xl text-xs font-bold border ${
                   bleedingLevel === 'none'
                     ? 'bg-slate-700 text-white border-slate-800'
                     : 'bg-slate-50 text-slate-600 border-slate-200'
@@ -133,35 +133,38 @@ export const TimeEditModal: React.FC<TimeEditModalProps> = ({
               <button
                 type="button"
                 onClick={() => setBleedingLevel('light')}
-                className={`py-1.5 px-1 rounded-xl text-xs font-bold border ${
+                className={`py-2 rounded-xl text-xs font-bold border flex items-center justify-center ${
                   bleedingLevel === 'light'
                     ? 'bg-rose-500 text-white border-rose-600'
                     : 'bg-rose-50 text-rose-700 border-rose-200'
                 }`}
               >
-                少量
+                <Droplet className="w-4 h-4 fill-current" />
               </button>
               <button
                 type="button"
                 onClick={() => setBleedingLevel('moderate')}
-                className={`py-1.5 px-1 rounded-xl text-xs font-bold border ${
+                className={`py-2 rounded-xl text-xs font-bold border flex items-center justify-center space-x-0.5 ${
                   bleedingLevel === 'moderate'
                     ? 'bg-rose-600 text-white border-rose-700'
                     : 'bg-rose-100 text-rose-800 border-rose-300'
                 }`}
               >
-                中程度
+                <Droplet className="w-3.5 h-3.5 fill-current" />
+                <Droplet className="w-3.5 h-3.5 fill-current" />
               </button>
               <button
                 type="button"
                 onClick={() => setBleedingLevel('heavy')}
-                className={`py-1.5 px-1 rounded-xl text-xs font-bold border ${
+                className={`py-2 rounded-xl text-xs font-bold border flex items-center justify-center space-x-0.5 ${
                   bleedingLevel === 'heavy'
                     ? 'bg-rose-800 text-white border-rose-900'
                     : 'bg-rose-200 text-rose-900 border-rose-400'
                 }`}
               >
-                多め
+                <Droplet className="w-3 h-3 fill-current" />
+                <Droplet className="w-3 h-3 fill-current" />
+                <Droplet className="w-3 h-3 fill-current" />
               </button>
             </div>
           </div>
