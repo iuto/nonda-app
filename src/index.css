@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-emerald-50/40 text-slate-800 antialiased selection:bg-emerald-200;
+  }
+}
+
+/* カスタムアニメーションとボタン効果 */
+.pulse-glow {
+  box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.4);
+}
