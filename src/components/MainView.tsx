@@ -63,7 +63,7 @@ export const MainView: React.FC<MainViewProps> = ({
 
   return (
     <div className="max-w-xl mx-auto px-4 md:px-6 py-6 space-y-5">
-      {/* ⚠️ 残薬警告カード (洗練されたアラートバナー) */}
+      {/* ⚠️ 残薬警告カード */}
       {isLowPills && (
         <div className="bg-amber-500 text-white rounded-2xl p-4 shadow-lg shadow-amber-500/15 border border-amber-400 flex items-center justify-center space-x-2.5 text-center animate-in fade-in slide-in-from-top-2">
           <AlertTriangle className="w-5 h-5 text-amber-100 shrink-0" />
@@ -73,12 +73,10 @@ export const MainView: React.FC<MainViewProps> = ({
         </div>
       )}
 
-      {/* 今日の日付と目標服薬時間 */}
+      {/* 今日の日付 (「目標 08:00」を削除し日付のみのシンプル表示) */}
       <div className="text-center">
-        <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-emerald-100/70 text-emerald-800 text-xs font-semibold border border-emerald-200/50">
+        <div className="inline-flex items-center px-4 py-1 rounded-full bg-emerald-100/70 text-emerald-800 text-xs font-semibold border border-emerald-200/50">
           <span>{dateFormatted}</span>
-          <span className="text-emerald-400">|</span>
-          <span>目標 {todayLog.targetTime}</span>
         </div>
       </div>
 
@@ -156,9 +154,8 @@ export const MainView: React.FC<MainViewProps> = ({
         )}
       </div>
 
-      {/* 🩸 副作用・出血の程度 ＆ 朝食後の追加薬 カード (洗練されたセグメントコントロール) */}
+      {/* 🩸 副作用・出血の程度 ＆ 朝食後の追加薬 カード */}
       <div className="bg-white/90 backdrop-blur-md rounded-3xl p-5 border border-slate-100 shadow-sm space-y-4">
-        {/* ヘッダー */}
         <div className="flex items-center space-x-2.5">
           <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center border border-rose-100">
             <Droplet className="w-4 h-4 fill-current" />
@@ -168,7 +165,6 @@ export const MainView: React.FC<MainViewProps> = ({
           </div>
         </div>
 
-        {/* 3段階おしゃれセグメントコントロール (iOSスタイル) */}
         <div className="bg-slate-100/80 p-1 rounded-2xl grid grid-cols-4 gap-1">
           <button
             onClick={() => onSetBleedingLevel('none')}
@@ -218,7 +214,6 @@ export const MainView: React.FC<MainViewProps> = ({
           </button>
         </div>
 
-        {/* 朝食後の追加薬エリア */}
         <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
           <div className="flex items-center space-x-2.5">
             <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
@@ -251,7 +246,7 @@ export const MainView: React.FC<MainViewProps> = ({
         </div>
       </div>
 
-      {/* 💊 薬の残数管理・補充カード (洗練デザイン) */}
+      {/* 💊 薬の残数管理・補充カード */}
       <div className="bg-white/90 backdrop-blur-md rounded-3xl p-5 border border-slate-100 shadow-sm space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2.5">
@@ -299,7 +294,6 @@ export const MainView: React.FC<MainViewProps> = ({
           )}
         </div>
 
-        {/* 30個単位での補充ショートカット */}
         <div className="pt-2 border-t border-slate-100 flex items-center justify-end space-x-2">
           <button
             onClick={() => handleAddQuickPills(30)}
