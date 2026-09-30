@@ -44,7 +44,6 @@ export const MainView: React.FC<MainViewProps> = ({
   const deviation = isTaken ? getDeviationStatus(todayLog.diffMinutes) : null;
   const recommendation = calculateNextRecommendation(logs, todayLog, settings.targetTime);
   
-  // 現在の出血レベル（旧互換含む）
   const currentBleedingLevel: BleedingLevel = todayLog.bleedingLevel ?? (todayLog.hasBleeding ? 'light' : 'none');
   const isExtraTaken = !!todayLog.extraTakenTime;
 
@@ -157,17 +156,14 @@ export const MainView: React.FC<MainViewProps> = ({
         )}
       </div>
 
-      {/* 💊 薬の残数管理・補充カード */}
+      {/* 💊 薬の残数管理・補充カード (余計な説明文をカット & 30個単位追加) */}
       <div className="bg-white rounded-2xl p-4 border border-emerald-100 shadow-xs space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
               <Pill className="w-4 h-4" />
             </div>
-            <div>
-              <p className="text-xs font-bold text-slate-800">薬の残り個数</p>
-              <p className="text-[11px] text-slate-500">飲んだ分だけ自動で減ります</p>
-            </div>
+            <p className="text-xs font-bold text-slate-800">薬の残り個数</p>
           </div>
 
           {!isEditingPills ? (
@@ -208,28 +204,26 @@ export const MainView: React.FC<MainViewProps> = ({
           )}
         </div>
 
-        <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-          <span className="text-[11px] text-slate-400">新しい薬をもらってきたら:</span>
-          <div className="flex items-center space-x-1.5">
-            <button
-              onClick={() => handleAddQuickPills(14)}
-              className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold border border-emerald-200 transition-colors flex items-center space-x-0.5 text-[11px]"
-            >
-              <Plus className="w-3 h-3" />
-              <span>14個追加</span>
-            </button>
-            <button
-              onClick={() => handleAddQuickPills(28)}
-              className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold border border-emerald-200 transition-colors flex items-center space-x-0.5 text-[11px]"
-            >
-              <Plus className="w-3 h-3" />
-              <span>28個追加</span>
-            </button>
-          </div>
+        {/* 30個単位での補充ショートカット */}
+        <div className="pt-2 border-t border-slate-100 flex items-center justify-end space-x-2">
+          <button
+            onClick={() => handleAddQuickPills(30)}
+            className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-all shadow-xs flex items-center space-x-1 text-xs"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>+30個追加</span>
+          </button>
+          <button
+            onClick={() => handleAddQuickPills(60)}
+            className="px-3 py-1.5 rounded-xl bg-emerald-100 hover:bg-emerald-200 text-emerald-900 font-bold transition-all border border-emerald-200 flex items-center space-x-1 text-xs"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>+60個追加</span>
+          </button>
         </div>
       </div>
 
-      {/* 🩸 副作用・出血の記録 (3段階程度選択ボタン) */}
+      {/* 🩸 副作用・出血の記録 */}
       <div className="bg-white rounded-2xl p-4 border border-rose-100 shadow-xs space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
@@ -245,7 +239,6 @@ export const MainView: React.FC<MainViewProps> = ({
           </div>
         </div>
 
-        {/* 出血程度 3段階セグメント選択ボタン */}
         <div className="grid grid-cols-4 gap-1.5 pt-1">
           <button
             onClick={() => onSetBleedingLevel('none')}
@@ -295,7 +288,6 @@ export const MainView: React.FC<MainViewProps> = ({
           </button>
         </div>
 
-        {/* 朝食後の追加薬エリア */}
         <div className="pt-2 border-t border-rose-50 flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
