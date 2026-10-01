@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { CheckCircle2, Clock, Edit3, RotateCcw, Pill, AlertTriangle, Plus, Check, Activity, Sparkles, Trash2 } from 'lucide-react';
 import { AppSettings, MedicationLog, BleedingLevel } from '../types/medication';
 import { getDeviationStatus } from '../utils/recommendation';
+import { triggerCelebrationConfetti } from '../utils/confetti';
 
 interface MainViewProps {
   todayLog: MedicationLog;
@@ -57,6 +58,19 @@ export const MainView: React.FC<MainViewProps> = ({
 
   const isLowPills = settings.remainingPills <= settings.alertThreshold;
 
+  const handleMainTakeNow = () => {
+    triggerCelebrationConfetti();
+    onTakeNow();
+  };
+
+  const handleToggleCustomItemWithConfetti = (itemId: string) => {
+    const isItemTaken = !!(todayLog.customLogs && todayLog.customLogs[itemId]) || (itemId === 'extra-1' && !!todayLog.extraTakenTime);
+    if (!isItemTaken) {
+      triggerCelebrationConfetti();
+    }
+    onToggleCustomItem(itemId);
+  };
+
   const handleSavePills = () => {
     const val = parseInt(inputPills, 10);
     if (!isNaN(val)) {
@@ -110,27 +124,25 @@ export const MainView: React.FC<MainViewProps> = ({
               </span>
             </div>
 
-            {/* 超大型「のんだ！」主役3Dアクションボタン */}
+            {/* 超大型「のんだ！」主役モダンプレミアムボタン */}
             <button
-              onClick={onTakeNow}
-              className="group relative w-full max-w-2xl py-6 md:py-8 px-6 rounded-3xl bg-gradient-to-b from-emerald-400 via-emerald-500 to-teal-600 text-white font-black shadow-[0_12px_28px_-6px_rgba(16,185,129,0.45),0_6px_0_0_#047857] hover:shadow-[0_16px_32px_-4px_rgba(16,185,129,0.5),0_8px_0_0_#047857] active:shadow-[0_6px_16px_-4px_rgba(16,185,129,0.4),0_2px_0_0_#047857] active:translate-y-1 hover:-translate-y-0.5 transition-all duration-150 flex flex-col items-center justify-center border-t-2 border-emerald-200/50 overflow-hidden"
+              onClick={handleMainTakeNow}
+              className="group relative w-full max-w-2xl py-6 md:py-8 px-8 rounded-3xl bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 text-white font-black shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/35 hover:scale-[1.01] active:scale-[0.985] transition-all duration-200 flex items-center justify-center space-x-3.5 border border-white/25 overflow-hidden"
             >
-              {/* ボタン上部の光沢ハイライト */}
-              <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/30 to-transparent pointer-events-none rounded-t-3xl" />
+              {/* 上部の繊細な光芒ハイライト */}
+              <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 via-white/5 to-transparent pointer-events-none rounded-t-3xl" />
 
-              <div className="relative flex items-center justify-center space-x-3 md:space-x-4 z-10">
-                <div className="p-2 md:p-2.5 rounded-2xl bg-white/20 backdrop-blur-xs group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300 border border-white/30 shadow-inner">
-                  <CheckCircle2 className="w-9 h-9 md:w-12 md:h-12 stroke-[2.8] text-white drop-shadow-md" />
-                </div>
-                <span className="text-3xl md:text-5xl tracking-wide drop-shadow-md font-black">
-                  のんだ！
-                </span>
-                <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-amber-200 animate-pulse drop-shadow-xs" />
+              <div className="p-3 md:p-3.5 rounded-2xl bg-white/20 backdrop-blur-md group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 border border-white/30 shadow-inner shrink-0 relative z-10">
+                <CheckCircle2 className="w-9 h-9 md:w-12 md:h-12 stroke-[2.8] text-white drop-shadow-xs" />
               </div>
 
-              <span className="relative z-10 mt-2 text-xs md:text-sm font-bold text-emerald-100/90 tracking-wider bg-black/10 px-3.5 py-1 rounded-full border border-white/10 backdrop-blur-xs">
-                タップして本日の服薬を完了 ✨
+              <span className="text-3xl md:text-5xl tracking-wider font-black drop-shadow-xs relative z-10">
+                のんだ！
               </span>
+
+              <div className="p-2 rounded-xl bg-white/10 group-hover:translate-x-0.5 transition-transform duration-300 relative z-10">
+                <Sparkles className="w-6 h-6 md:w-7 md:h-7 text-amber-200 animate-pulse" />
+              </div>
             </button>
 
             <button
@@ -365,8 +377,8 @@ export const MainView: React.FC<MainViewProps> = ({
                     <div className="flex items-center space-x-1.5">
                       {!isItemTaken ? (
                         <button
-                          onClick={() => onToggleCustomItem(item.id)}
-                          className="px-3.5 py-1.5 rounded-xl bg-gradient-to-b from-emerald-400 to-teal-600 hover:from-emerald-500 hover:to-teal-700 text-white text-xs font-bold shadow-[0_4px_10px_-2px_rgba(16,185,129,0.35),0_3px_0_0_#047857] active:shadow-[0_2px_4px_-2px_rgba(16,185,129,0.3),0_1px_0_0_#047857] active:translate-y-0.5 hover:-translate-y-0.5 transition-all duration-150 flex items-center space-x-1 border-t border-white/30"
+                          onClick={() => handleToggleCustomItemWithConfetti(item.id)}
+                          className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-bold shadow-md shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all duration-150 flex items-center space-x-1 border border-white/20"
                         >
                           <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.5]" />
                           <span>のんだ！</span>
