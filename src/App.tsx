@@ -266,7 +266,6 @@ export function App() {
             onTakeNow={handleTakeNow}
             onCancelTake={handleCancelTake}
             onSetBleedingLevel={(level) => handleSetBleedingLevel(todayDateStr, level)}
-            onSetNote={(note) => handleSetNote(todayDateStr, note)}
             onToggleCustomItem={handleToggleCustomItem}
             onAddCustomItem={handleAddCustomItem}
             onDeleteCustomItem={handleDeleteCustomItem}
@@ -278,8 +277,10 @@ export function App() {
           <ResultView
             logs={logs}
             settings={settings}
+            todayLog={todayLog}
             onBackToMain={() => setCurrentTab('main')}
             onEditLog={handleOpenEditForLog}
+            onSetNote={(note) => handleSetNote(todayDateStr, note)}
           />
         )}
       </main>

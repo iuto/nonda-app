@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Clock, Edit3, RotateCcw, Pill, AlertTriangle, Plus, Check, Activity, Sparkles, Trash2, FileText } from 'lucide-react';
+import { CheckCircle2, Clock, Edit3, RotateCcw, Pill, AlertTriangle, Plus, Check, Activity, Sparkles, Trash2 } from 'lucide-react';
 import { AppSettings, MedicationLog, BleedingLevel } from '../types/medication';
 import { getDeviationStatus } from '../utils/recommendation';
 
@@ -9,7 +9,6 @@ interface MainViewProps {
   onTakeNow: () => void;
   onCancelTake: () => void;
   onSetBleedingLevel: (level: BleedingLevel) => void;
-  onSetNote: (note: string) => void;
   onToggleCustomItem: (itemId: string) => void;
   onAddCustomItem: (name: string) => void;
   onDeleteCustomItem: (itemId: string) => void;
@@ -24,7 +23,6 @@ export const MainView: React.FC<MainViewProps> = ({
   onTakeNow,
   onCancelTake,
   onSetBleedingLevel,
-  onSetNote,
   onToggleCustomItem,
   onAddCustomItem,
   onDeleteCustomItem,
@@ -324,23 +322,6 @@ export const MainView: React.FC<MainViewProps> = ({
               <span className="w-2 h-2 rounded-full bg-current"></span>
               <span className="w-2 h-2 rounded-full bg-current"></span>
             </button>
-          </div>
-
-          {/* 体調メモ入力エリア */}
-          <div className="pt-2 space-y-1.5">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-700 flex items-center space-x-1">
-                <FileText className="w-3.5 h-3.5 text-emerald-600" />
-                <span>本日の体調メモ</span>
-              </span>
-            </div>
-            <textarea
-              value={todayLog.note || ''}
-              onChange={(e) => onSetNote(e.target.value)}
-              placeholder="頭痛、吐き気、だるさなど気になった体調を記録..."
-              rows={2}
-              className="w-full text-xs p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white resize-none"
-            />
           </div>
 
           {/* 追加のお薬・サプリの記録エリア */}

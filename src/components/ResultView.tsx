@@ -6,15 +6,19 @@ import { Calendar, Clock, ArrowLeft, Edit2, Pill, Activity, Sparkles, FileText }
 interface ResultViewProps {
   logs: MedicationLog[];
   settings?: AppSettings;
+  todayLog?: MedicationLog;
   onBackToMain: () => void;
   onEditLog: (log: MedicationLog) => void;
+  onSetNote?: (note: string) => void;
 }
 
 export const ResultView: React.FC<ResultViewProps> = ({
   logs,
   settings,
+  todayLog,
   onBackToMain,
   onEditLog,
+  onSetNote,
 }) => {
   const sortedLogs = [...logs].sort((a, b) => b.date.localeCompare(a.date));
 
@@ -97,6 +101,33 @@ export const ResultView: React.FC<ResultViewProps> = ({
           <p className="text-[10px] md:text-xs text-orange-700">副作用等の記録合計</p>
         </div>
       </div>
+
+      {/* 本日の体調メモ入力カード */}
+      {todayLog && onSetNote && (
+        <div className="bg-white rounded-3xl p-5 border border-amber-200/90 shadow-sm space-y-3 ring-1 ring-amber-100">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2.5">
+              <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-200/70">
+                <FileText className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="text-xs font-bold text-slate-800">本日の体調メモを記録</h3>
+                <p className="text-[10px] text-slate-400">頭痛、吐き気、だるさなど気になった体調をリアルタイム保存</p>
+              </div>
+            </div>
+            <span className="text-xs font-bold text-amber-900 bg-amber-50 px-3 py-1 rounded-full border border-amber-200/80">
+              {formatDateLabel(todayLog.date)}
+            </span>
+          </div>
+          <textarea
+            value={todayLog.note || ''}
+            onChange={(e) => onSetNote(e.target.value)}
+            placeholder="本日の体調や症状をメモ（例: 朝から軽い頭痛、少し胃の不快感あり）"
+            rows={2}
+            className="w-full text-xs p-3 rounded-2xl bg-amber-50/40 border border-amber-200/70 text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white resize-none"
+          />
+        </div>
+      )}
 
       {/* 凡例ガイド */}
       <div className="bg-white/80 rounded-2xl p-3.5 border border-emerald-100 text-xs text-slate-600 flex flex-wrap items-center justify-between gap-2">
