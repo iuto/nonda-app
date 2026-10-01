@@ -116,7 +116,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
 
         {sortedLogs.length === 0 ? (
           <div className="bg-white rounded-3xl p-8 text-center text-slate-400 text-xs border border-emerald-100">
-            まだ服薬履歴がありません。「飲んだ！」ボタンを押して記録をスタートしましょう！
+            まだ服薬履歴がありません。「のんだ！」ボタンを押して記録をスタートしましょう！
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">

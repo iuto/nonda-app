@@ -116,7 +116,7 @@ export const MainView: React.FC<MainViewProps> = ({
               className="w-full h-36 md:h-40 rounded-3xl bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 text-white font-black text-4xl md:text-5xl shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:scale-[1.015] active:scale-[0.985] transition-all duration-200 flex items-center justify-center space-x-3.5 border-2 border-white/80 ring-4 ring-emerald-50"
             >
               <CheckCircle2 className="w-12 h-12 md:w-14 md:h-14 stroke-[2.5]" />
-              <span>飲んだ！</span>
+              <span>のんだ！</span>
             </button>
 
             <button
@@ -265,7 +265,7 @@ export const MainView: React.FC<MainViewProps> = ({
                         className="px-3 py-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-bold shadow-xs transition-all flex items-center space-x-1"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.5]" />
-                        <span>飲んだ！</span>
+                        <span>のんだ！</span>
                       </button>
                     ) : (
                       <div className="flex items-center space-x-1.5">
