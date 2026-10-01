@@ -110,13 +110,27 @@ export const MainView: React.FC<MainViewProps> = ({
               </span>
             </div>
 
-            {/* 超大型「のんだ！」主役横長ボタン */}
+            {/* 超大型「のんだ！」主役3Dアクションボタン */}
             <button
               onClick={onTakeNow}
-              className="w-full max-w-2xl h-28 md:h-36 rounded-3xl bg-gradient-to-br from-emerald-500 via-emerald-600 to-teal-600 text-white font-black text-3xl md:text-5xl shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 flex items-center justify-center space-x-3.5 border-2 border-white/80 ring-4 ring-emerald-50"
+              className="group relative w-full max-w-2xl py-6 md:py-8 px-6 rounded-3xl bg-gradient-to-b from-emerald-400 via-emerald-500 to-teal-600 text-white font-black shadow-[0_12px_28px_-6px_rgba(16,185,129,0.45),0_6px_0_0_#047857] hover:shadow-[0_16px_32px_-4px_rgba(16,185,129,0.5),0_8px_0_0_#047857] active:shadow-[0_6px_16px_-4px_rgba(16,185,129,0.4),0_2px_0_0_#047857] active:translate-y-1 hover:-translate-y-0.5 transition-all duration-150 flex flex-col items-center justify-center border-t-2 border-emerald-200/50 overflow-hidden"
             >
-              <CheckCircle2 className="w-10 h-10 md:w-14 md:h-14 stroke-[2.5]" />
-              <span>のんだ！</span>
+              {/* ボタン上部の光沢ハイライト */}
+              <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/30 to-transparent pointer-events-none rounded-t-3xl" />
+
+              <div className="relative flex items-center justify-center space-x-3 md:space-x-4 z-10">
+                <div className="p-2 md:p-2.5 rounded-2xl bg-white/20 backdrop-blur-xs group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300 border border-white/30 shadow-inner">
+                  <CheckCircle2 className="w-9 h-9 md:w-12 md:h-12 stroke-[2.8] text-white drop-shadow-md" />
+                </div>
+                <span className="text-3xl md:text-5xl tracking-wide drop-shadow-md font-black">
+                  のんだ！
+                </span>
+                <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-amber-200 animate-pulse drop-shadow-xs" />
+              </div>
+
+              <span className="relative z-10 mt-2 text-xs md:text-sm font-bold text-emerald-100/90 tracking-wider bg-black/10 px-3.5 py-1 rounded-full border border-white/10 backdrop-blur-xs">
+                タップして本日の服薬を完了 ✨
+              </span>
             </button>
 
             <button
@@ -352,7 +366,7 @@ export const MainView: React.FC<MainViewProps> = ({
                       {!isItemTaken ? (
                         <button
                           onClick={() => onToggleCustomItem(item.id)}
-                          className="px-3 py-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-bold shadow-xs transition-all flex items-center space-x-1"
+                          className="px-3.5 py-1.5 rounded-xl bg-gradient-to-b from-emerald-400 to-teal-600 hover:from-emerald-500 hover:to-teal-700 text-white text-xs font-bold shadow-[0_4px_10px_-2px_rgba(16,185,129,0.35),0_3px_0_0_#047857] active:shadow-[0_2px_4px_-2px_rgba(16,185,129,0.3),0_1px_0_0_#047857] active:translate-y-0.5 hover:-translate-y-0.5 transition-all duration-150 flex items-center space-x-1 border-t border-white/30"
                         >
                           <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.5]" />
                           <span>のんだ！</span>
