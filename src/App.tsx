@@ -117,6 +117,22 @@ export function App() {
     saveLogs(newLogs);
   };
 
+  const handleSetNote = (dateStr: string, note: string) => {
+    const targetLog = logs.find((l) => l.date === dateStr) || getOrCreateLogForDate(dateStr, settings.targetTime, logs);
+    const updatedLog: MedicationLog = {
+      ...targetLog,
+      note,
+    };
+
+    const exists = logs.some((l) => l.date === dateStr);
+    const newLogs = exists
+      ? logs.map((l) => (l.date === dateStr ? updatedLog : l))
+      : [updatedLog, ...logs];
+
+    setLogs(newLogs);
+    saveLogs(newLogs);
+  };
+
   const handleSetRemainingPills = (count: number) => {
     const newSettings = { ...settings, remainingPills: Math.max(0, count) };
     setSettings(newSettings);
@@ -127,13 +143,15 @@ export function App() {
     dateStr: string,
     takenTime: string | null,
     bleedingLevel?: BleedingLevel,
-    extraTakenTime?: string | null
+    extraTakenTime?: string | null,
+    note?: string
   ) => {
     const targetLog = logs.find((l) => l.date === dateStr) || getOrCreateLogForDate(dateStr, settings.targetTime, logs);
 
     let updatedLog: MedicationLog;
 
     const finalLevel = bleedingLevel ?? targetLog.bleedingLevel ?? (targetLog.hasBleeding ? 'light' : 'none');
+    const finalNote = note !== undefined ? note : targetLog.note;
 
     if (takenTime === null) {
       updatedLog = {
@@ -144,6 +162,7 @@ export function App() {
         bleedingLevel: finalLevel,
         hasBleeding: finalLevel !== 'none',
         extraTakenTime: extraTakenTime !== undefined ? extraTakenTime : targetLog.extraTakenTime,
+        note: finalNote,
       };
     } else {
       // 指定された時間で目標と服用時刻を同期して「ズレ0分（時間通り）」とする
@@ -156,6 +175,7 @@ export function App() {
         bleedingLevel: finalLevel,
         hasBleeding: finalLevel !== 'none',
         extraTakenTime: extraTakenTime !== undefined ? extraTakenTime : targetLog.extraTakenTime,
+        note: finalNote,
       };
     }
 
@@ -246,6 +266,7 @@ export function App() {
             onTakeNow={handleTakeNow}
             onCancelTake={handleCancelTake}
             onSetBleedingLevel={(level) => handleSetBleedingLevel(todayDateStr, level)}
+            onSetNote={(note) => handleSetNote(todayDateStr, note)}
             onToggleCustomItem={handleToggleCustomItem}
             onAddCustomItem={handleAddCustomItem}
             onDeleteCustomItem={handleDeleteCustomItem}

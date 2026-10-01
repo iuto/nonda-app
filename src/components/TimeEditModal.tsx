@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MedicationLog, BleedingLevel } from '../types/medication';
-import { X, Clock, Check, RotateCcw, Pill, Activity } from 'lucide-react';
+import { X, Clock, Check, RotateCcw, Pill, Activity, FileText } from 'lucide-react';
 
 interface TimeEditModalProps {
   isOpen: boolean;
@@ -10,7 +10,8 @@ interface TimeEditModalProps {
     date: string,
     takenTime: string | null,
     bleedingLevel?: BleedingLevel,
-    extraTakenTime?: string | null
+    extraTakenTime?: string | null,
+    note?: string
   ) => void;
 }
 
@@ -24,6 +25,7 @@ export const TimeEditModal: React.FC<TimeEditModalProps> = ({
   const [bleedingLevel, setBleedingLevel] = useState<BleedingLevel>('none');
   const [extraTime, setExtraTime] = useState<string>('');
   const [isExtraEnabled, setIsExtraEnabled] = useState<boolean>(false);
+  const [note, setNote] = useState<string>('');
 
   useEffect(() => {
     if (log) {
@@ -43,6 +45,7 @@ export const TimeEditModal: React.FC<TimeEditModalProps> = ({
         setExtraTime('09:00');
         setIsExtraEnabled(false);
       }
+      setNote(log.note || '');
     }
   }, [log]);
 
@@ -57,18 +60,18 @@ export const TimeEditModal: React.FC<TimeEditModalProps> = ({
 
   const handleSave = () => {
     const finalExtraTime = isExtraEnabled ? extraTime : null;
-    onSave(log.date, time, bleedingLevel, finalExtraTime);
+    onSave(log.date, time, bleedingLevel, finalExtraTime, note);
     onClose();
   };
 
   const handleReset = () => {
-    onSave(log.date, null, bleedingLevel, null);
+    onSave(log.date, null, bleedingLevel, null, note);
     onClose();
   };
 
   return (
     <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-xl space-y-5 border border-emerald-100 animate-in fade-in zoom-in-95 duration-150">
+      <div className="bg-white rounded-3xl max-w-sm w-full p-6 shadow-xl space-y-5 border border-emerald-100 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
         {/* モーダルヘッダー */}
         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <div className="flex items-center space-x-2">
@@ -170,6 +173,23 @@ export const TimeEditModal: React.FC<TimeEditModalProps> = ({
                 <span className="w-2 h-2 rounded-full bg-current"></span>
               </button>
             </div>
+          </div>
+
+          {/* 体調メモ入力 */}
+          <div className="pt-2 border-t border-slate-100 space-y-1.5">
+            <div className="flex items-center space-x-1.5">
+              <FileText className="w-3.5 h-3.5 text-emerald-600" />
+              <label className="block text-xs font-bold text-slate-700">
+                体調メモ
+              </label>
+            </div>
+            <textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="症状や体調の変化をメモ（例: 少し頭痛あり、だるさ、腹痛など）"
+              rows={3}
+              className="w-full text-xs p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white resize-none"
+            />
           </div>
 
           {/* 朝食後の追加薬設定 */}

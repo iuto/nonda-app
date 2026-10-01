@@ -1,7 +1,7 @@
 import React from 'react';
 import { MedicationLog, AppSettings, BleedingLevel, CustomMedicationItem } from '../types/medication';
 import { getDeviationStatus } from '../utils/recommendation';
-import { Calendar, Clock, ArrowLeft, Edit2, Pill, Activity, Sparkles } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, Edit2, Pill, Activity, Sparkles, FileText } from 'lucide-react';
 
 interface ResultViewProps {
   logs: MedicationLog[];
@@ -31,7 +31,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
   }
 
   const perfectRate = totalTaken > 0 ? Math.round((perfectCount / totalTaken) * 100) : 100;
-  const bleedingDaysCount = logs.filter((l) => (l.bleedingLevel && l.bleedingLevel !== 'none') || l.hasBleeding).length;
+  const bleedingDaysCount = logs.filter((l) => (l.bleedingLevel && l.bleedingLevel !== 'none') || l.hasBleeding || (l.note && l.note.trim() !== '')).length;
 
   const formatDateLabel = (dateStr: string) => {
     const [y, m, d] = dateStr.split('-');
@@ -125,12 +125,13 @@ export const ResultView: React.FC<ResultViewProps> = ({
               const status = isTaken ? getDeviationStatus(0) : getDeviationStatus(null);
               const bleedingBadge = getBleedingBadge(log.bleedingLevel, log.hasBleeding);
               const isExtraTaken = !!log.extraTakenTime;
+              const hasNote = !!(log.note && log.note.trim() !== '');
 
               return (
                 <div
                   key={log.id}
                   className={`bg-white rounded-2xl p-4 border shadow-xs transition-all space-y-3 ${
-                    bleedingBadge ? 'border-orange-200 ring-1 ring-orange-100' : 'border-slate-100 hover:border-emerald-200'
+                    bleedingBadge || hasNote ? 'border-orange-200 ring-1 ring-orange-100' : 'border-slate-100 hover:border-emerald-200'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -209,6 +210,19 @@ export const ResultView: React.FC<ResultViewProps> = ({
                       return null;
                     })()}
                   </div>
+
+                  {/* 体調メモ表示 */}
+                  {hasNote && (
+                    <div className="bg-amber-50/80 border border-amber-200/80 rounded-xl p-2.5 space-y-1">
+                      <div className="flex items-center space-x-1.5 text-amber-900 font-bold text-[11px]">
+                        <FileText className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                        <span>体調メモ</span>
+                      </div>
+                      <p className="text-xs text-slate-700 whitespace-pre-wrap pl-5 font-medium leading-relaxed">
+                        {log.note}
+                      </p>
+                    </div>
+                  )}
 
                   {isTaken && (
                     <div className="space-y-1">
