@@ -59,10 +59,6 @@ export const MainView: React.FC<MainViewProps> = ({
     setIsEditingPills(false);
   };
 
-  const handleAddQuickPills = (addCount: number) => {
-    onSetRemainingPills(settings.remainingPills + addCount);
-  };
-
   const handleCustomAddPills = () => {
     const val = parseInt(customAddCount, 10);
     if (!isNaN(val) && val > 0) {
@@ -305,25 +301,16 @@ export const MainView: React.FC<MainViewProps> = ({
           )}
         </div>
 
-        {/* 自由個数追加 ＆ 30個ワンタップ追加 */}
-        <div className="pt-2 border-t border-slate-100 flex items-center justify-end space-x-2">
+        {/* 自由個数追加 */}
+        <div className="pt-2 border-t border-slate-100 flex items-center justify-end">
           {!isCustomAdding ? (
-            <>
-              <button
-                onClick={() => handleAddQuickPills(30)}
-                className="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold border border-emerald-200 transition-all shadow-xs flex items-center space-x-1 text-xs"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>+30個追加</span>
-              </button>
-              <button
-                onClick={() => setIsCustomAdding(true)}
-                className="px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold transition-all border border-slate-200 flex items-center space-x-1 text-xs"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>自由な個数を追加</span>
-              </button>
-            </>
+            <button
+              onClick={() => setIsCustomAdding(true)}
+              className="px-3.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold border border-emerald-200/80 transition-all shadow-xs flex items-center space-x-1.5 text-xs"
+            >
+              <Plus className="w-3.5 h-3.5 text-emerald-600" />
+              <span>+ 薬を追加</span>
+            </button>
           ) : (
             <div className="flex items-center space-x-1.5 animate-in fade-in">
               <span className="text-xs font-bold text-slate-600">+</span>
