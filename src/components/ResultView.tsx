@@ -1,7 +1,7 @@
 import React from 'react';
-import { MedicationLog, AppSettings, BleedingLevel } from '../types/medication';
+import { MedicationLog, AppSettings, BleedingLevel, CustomMedicationItem } from '../types/medication';
 import { getDeviationStatus } from '../utils/recommendation';
-import { Calendar, Clock, ArrowLeft, Edit2, Pill, Activity } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, Edit2, Pill, Activity, Sparkles } from 'lucide-react';
 
 interface ResultViewProps {
   logs: MedicationLog[];
@@ -12,6 +12,7 @@ interface ResultViewProps {
 
 export const ResultView: React.FC<ResultViewProps> = ({
   logs,
+  settings,
   onBackToMain,
   onEditLog,
 }) => {
@@ -169,17 +170,44 @@ export const ResultView: React.FC<ResultViewProps> = ({
                       </div>
                     </div>
 
-                    {isExtraTaken && (
-                      <div className="pt-1 border-t border-slate-200/60 flex items-center justify-between text-emerald-800 font-semibold">
-                        <span className="flex items-center space-x-1">
-                          <Pill className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>朝食後の追加薬</span>
-                        </span>
-                        <span className="bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded-md text-[11px]">
-                          {log.extraTakenTime} 服用済み
-                        </span>
-                      </div>
-                    )}
+                    {/* 追加のお薬・サプリログ */}
+                    {(() => {
+                      const entries = Object.entries(log.customLogs || {});
+                      if (entries.length > 0) {
+                        return entries.map(([itemId, time]) => {
+                          if (!time) return null;
+                          const itemObj = settings?.customItems?.find((i: CustomMedicationItem) => i.id === itemId);
+                          const itemName = itemObj ? itemObj.name : (itemId === 'extra-1' ? '朝食後の追加薬' : '追加のお薬・サプリ');
+                          return (
+                            <div key={itemId} className="pt-1 border-t border-slate-200/60 flex items-center justify-between text-emerald-800 font-semibold">
+                              <span className="flex items-center space-x-1">
+                                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                                <span>{itemName}</span>
+                              </span>
+                              <span className="bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded-md text-[11px]">
+                                {time} 服用済み
+                              </span>
+                            </div>
+                          );
+                        });
+                      }
+
+                      if (isExtraTaken) {
+                        return (
+                          <div className="pt-1 border-t border-slate-200/60 flex items-center justify-between text-emerald-800 font-semibold">
+                            <span className="flex items-center space-x-1">
+                              <Pill className="w-3.5 h-3.5 text-emerald-600" />
+                              <span>朝食後の追加薬</span>
+                            </span>
+                            <span className="bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded-md text-[11px]">
+                              {log.extraTakenTime} 服用済み
+                            </span>
+                          </div>
+                        );
+                      }
+
+                      return null;
+                    })()}
                   </div>
 
                   {isTaken && (

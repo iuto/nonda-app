@@ -117,55 +117,6 @@ export function App() {
     saveLogs(newLogs);
   };
 
-  const handleTakeExtra = (dateStr: string) => {
-    const now = new Date();
-    const hh = String(now.getHours()).padStart(2, '0');
-    const mm = String(now.getMinutes()).padStart(2, '0');
-    const extraTimeStr = `${hh}:${mm}`;
-
-    const targetLog = logs.find((l) => l.date === dateStr) || getOrCreateLogForDate(dateStr, settings.targetTime, logs);
-    
-    if (!targetLog.extraTakenTime) {
-      updatePills(-1);
-    }
-
-    const updatedLog: MedicationLog = {
-      ...targetLog,
-      extraTakenTime: extraTimeStr,
-      extraTakenAt: now.toISOString(),
-    };
-
-    const exists = logs.some((l) => l.date === dateStr);
-    const newLogs = exists
-      ? logs.map((l) => (l.date === dateStr ? updatedLog : l))
-      : [updatedLog, ...logs];
-
-    setLogs(newLogs);
-    saveLogs(newLogs);
-  };
-
-  const handleCancelTakeExtra = (dateStr: string) => {
-    const targetLog = logs.find((l) => l.date === dateStr) || getOrCreateLogForDate(dateStr, settings.targetTime, logs);
-    
-    if (targetLog.extraTakenTime) {
-      updatePills(1);
-    }
-
-    const updatedLog: MedicationLog = {
-      ...targetLog,
-      extraTakenTime: null,
-      extraTakenAt: null,
-    };
-
-    const exists = logs.some((l) => l.date === dateStr);
-    const newLogs = exists
-      ? logs.map((l) => (l.date === dateStr ? updatedLog : l))
-      : [updatedLog, ...logs];
-
-    setLogs(newLogs);
-    saveLogs(newLogs);
-  };
-
   const handleSetRemainingPills = (count: number) => {
     const newSettings = { ...settings, remainingPills: Math.max(0, count) };
     setSettings(newSettings);
@@ -217,6 +168,64 @@ export function App() {
     saveLogs(newLogs);
   };
 
+  const handleAddCustomItem = (name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    const newItem = { id: `item-${Date.now()}`, name: trimmed };
+    const currentItems = settings.customItems || [{ id: 'extra-1', name: '朝食後の追加薬' }];
+    const newSettings = { ...settings, customItems: [...currentItems, newItem] };
+    setSettings(newSettings);
+    saveSettings(newSettings);
+  };
+
+  const handleDeleteCustomItem = (itemId: string) => {
+    const currentItems = settings.customItems || [{ id: 'extra-1', name: '朝食後の追加薬' }];
+    const newItems = currentItems.filter((item) => item.id !== itemId);
+    const newSettings = { ...settings, customItems: newItems };
+    setSettings(newSettings);
+    saveSettings(newSettings);
+  };
+
+  const handleToggleCustomItem = (itemId: string) => {
+    const targetLog = logs.find((l) => l.date === todayDateStr) || getOrCreateLogForDate(todayDateStr, settings.targetTime, logs);
+    const currentCustomLogs = targetLog.customLogs || {};
+
+    const isTaken = !!currentCustomLogs[itemId] || (itemId === 'extra-1' && !!targetLog.extraTakenTime);
+
+    let newCustomLogs = { ...currentCustomLogs };
+    let extraTakenTime = targetLog.extraTakenTime;
+
+    if (isTaken) {
+      delete newCustomLogs[itemId];
+      if (itemId === 'extra-1') {
+        extraTakenTime = null;
+      }
+    } else {
+      const now = new Date();
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const takenTimeStr = `${hh}:${mm}`;
+      newCustomLogs[itemId] = takenTimeStr;
+      if (itemId === 'extra-1') {
+        extraTakenTime = takenTimeStr;
+      }
+    }
+
+    const updatedLog: MedicationLog = {
+      ...targetLog,
+      extraTakenTime,
+      customLogs: newCustomLogs,
+    };
+
+    const exists = logs.some((l) => l.date === todayDateStr);
+    const newLogs = exists
+      ? logs.map((l) => (l.date === todayDateStr ? updatedLog : l))
+      : [updatedLog, ...logs];
+
+    setLogs(newLogs);
+    saveLogs(newLogs);
+  };
+
   const handleOpenEditForLog = (log: MedicationLog) => {
     setEditingLog(log);
     setIsEditModalOpen(true);
@@ -232,14 +241,14 @@ export function App() {
       <main className="flex-1 pb-10">
         {currentTab === 'main' ? (
           <MainView
-            logs={logs}
             todayLog={todayLog}
             settings={settings}
             onTakeNow={handleTakeNow}
             onCancelTake={handleCancelTake}
             onSetBleedingLevel={(level) => handleSetBleedingLevel(todayDateStr, level)}
-            onTakeExtra={() => handleTakeExtra(todayDateStr)}
-            onCancelTakeExtra={() => handleCancelTakeExtra(todayDateStr)}
+            onToggleCustomItem={handleToggleCustomItem}
+            onAddCustomItem={handleAddCustomItem}
+            onDeleteCustomItem={handleDeleteCustomItem}
             onSetRemainingPills={handleSetRemainingPills}
             onOpenEditModal={() => handleOpenEditForLog(todayLog)}
             onOpenResult={() => setCurrentTab('result')}

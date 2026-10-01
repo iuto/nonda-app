@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Clock, Edit3, RotateCcw, Pill, AlertTriangle, Plus, Check, Activity } from 'lucide-react';
+import { CheckCircle2, Clock, Edit3, RotateCcw, Pill, AlertTriangle, Plus, Check, Activity, Sparkles, Trash2 } from 'lucide-react';
 import { AppSettings, MedicationLog, BleedingLevel } from '../types/medication';
 import { getDeviationStatus } from '../utils/recommendation';
 
 interface MainViewProps {
-  logs: MedicationLog[];
   todayLog: MedicationLog;
   settings: AppSettings;
   onTakeNow: () => void;
   onCancelTake: () => void;
   onSetBleedingLevel: (level: BleedingLevel) => void;
-  onTakeExtra: () => void;
-  onCancelTakeExtra: () => void;
+  onToggleCustomItem: (itemId: string) => void;
+  onAddCustomItem: (name: string) => void;
+  onDeleteCustomItem: (itemId: string) => void;
   onSetRemainingPills: (count: number) => void;
   onOpenEditModal: () => void;
   onOpenResult: () => void;
@@ -23,8 +23,9 @@ export const MainView: React.FC<MainViewProps> = ({
   onTakeNow,
   onCancelTake,
   onSetBleedingLevel,
-  onTakeExtra,
-  onCancelTakeExtra,
+  onToggleCustomItem,
+  onAddCustomItem,
+  onDeleteCustomItem,
   onSetRemainingPills,
   onOpenEditModal,
 }) => {
@@ -34,6 +35,12 @@ export const MainView: React.FC<MainViewProps> = ({
   // 自由追加用ステート
   const [customAddCount, setCustomAddCount] = useState('30');
   const [isCustomAdding, setIsCustomAdding] = useState(false);
+
+  // 新しいお薬・サプリの自由追加ステート
+  const [newItemName, setNewItemName] = useState('');
+  const [isAddingNewItem, setIsAddingNewItem] = useState(false);
+
+  const customItems = settings.customItems || [{ id: 'extra-1', name: '朝食後の追加薬' }];
 
   const today = new Date();
   const dateFormatted = today.toLocaleDateString('ja-JP', {
@@ -47,7 +54,6 @@ export const MainView: React.FC<MainViewProps> = ({
   const deviation = isTaken ? getDeviationStatus(todayLog.diffMinutes) : null;
   
   const currentBleedingLevel: BleedingLevel = todayLog.bleedingLevel ?? (todayLog.hasBleeding ? 'light' : 'none');
-  const isExtraTaken = !!todayLog.extraTakenTime;
 
   const isLowPills = settings.remainingPills <= settings.alertThreshold;
 
@@ -65,6 +71,14 @@ export const MainView: React.FC<MainViewProps> = ({
       onSetRemainingPills(settings.remainingPills + val);
     }
     setIsCustomAdding(false);
+  };
+
+  const handleAddNewItem = () => {
+    if (newItemName.trim()) {
+      onAddCustomItem(newItemName.trim());
+      setNewItemName('');
+      setIsAddingNewItem(false);
+    }
   };
 
   return (
@@ -220,36 +234,107 @@ export const MainView: React.FC<MainViewProps> = ({
           </button>
         </div>
 
-        {/* 朝食後の追加薬エリア */}
-        <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-          <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
-              <Pill className="w-4 h-4" />
-            </div>
-            <span className="text-xs font-bold text-slate-700">朝食後の追加薬</span>
+        {/* 追加のお薬・サプリの記録エリア */}
+        <div className="pt-3 border-t border-slate-100 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-700">追加のお薬・サプリの記録</span>
           </div>
 
-          {!isExtraTaken ? (
-            <button
-              onClick={onTakeExtra}
-              className="px-4 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-bold shadow-xs transition-all flex items-center space-x-1"
-            >
-              <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.5]" />
-              <span>飲んだ！</span>
-            </button>
-          ) : (
-            <div className="flex items-center space-x-2">
-              <span className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-xl">
-                {todayLog.extraTakenTime} 服用済み
-              </span>
+          <div className="space-y-2">
+            {customItems.map((item) => {
+              const takenTime = (todayLog.customLogs && todayLog.customLogs[item.id]) 
+                || (item.id === 'extra-1' ? todayLog.extraTakenTime : null);
+              const isItemTaken = !!takenTime;
+
+              return (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-2.5 rounded-2xl bg-slate-50/80 border border-slate-100/90"
+                >
+                  <div className="flex items-center space-x-2">
+                    <div className="w-6 h-6 rounded-lg bg-emerald-100/80 text-emerald-700 flex items-center justify-center">
+                      <Sparkles className="w-3 h-3 text-emerald-600" />
+                    </div>
+                    <span className="text-xs font-bold text-slate-700">{item.name}</span>
+                  </div>
+
+                  <div className="flex items-center space-x-1.5">
+                    {!isItemTaken ? (
+                      <button
+                        onClick={() => onToggleCustomItem(item.id)}
+                        className="px-3 py-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-bold shadow-xs transition-all flex items-center space-x-1"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.5]" />
+                        <span>飲んだ！</span>
+                      </button>
+                    ) : (
+                      <div className="flex items-center space-x-1.5">
+                        <span className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-xl">
+                          {takenTime} 服用済み
+                        </span>
+                        <button
+                          onClick={() => onToggleCustomItem(item.id)}
+                          className="text-[11px] text-slate-400 hover:text-rose-600 underline transition-colors"
+                        >
+                          取り消す
+                        </button>
+                      </div>
+                    )}
+
+                    <button
+                      onClick={() => onDeleteCustomItem(item.id)}
+                      className="p-1 text-slate-300 hover:text-rose-500 rounded-lg transition-colors ml-0.5"
+                      title="削除"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* 新しいお薬・サプリの追加ボタン／フォーム */}
+          <div className="pt-1">
+            {!isAddingNewItem ? (
               <button
-                onClick={onCancelTakeExtra}
-                className="text-[11px] text-slate-400 hover:text-rose-600 underline transition-colors"
+                onClick={() => setIsAddingNewItem(true)}
+                className="w-full py-2 rounded-xl bg-emerald-50/60 hover:bg-emerald-100/60 text-emerald-800 font-bold border border-emerald-200/50 transition-all flex items-center justify-center space-x-1 text-xs"
               >
-                取り消す
+                <Plus className="w-3.5 h-3.5 text-emerald-600" />
+                <span>新しいお薬・サプリを追加</span>
               </button>
-            </div>
-          )}
+            ) : (
+              <div className="flex items-center space-x-1.5 animate-in fade-in pt-1">
+                <input
+                  type="text"
+                  value={newItemName}
+                  onChange={(e) => setNewItemName(e.target.value)}
+                  placeholder="名前（例: マルチビタミン、鉄分）"
+                  className="flex-1 px-3 py-1.5 text-xs font-medium rounded-xl border border-emerald-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleAddNewItem();
+                  }}
+                />
+                <button
+                  onClick={handleAddNewItem}
+                  className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs"
+                >
+                  追加
+                </button>
+                <button
+                  onClick={() => {
+                    setIsAddingNewItem(false);
+                    setNewItemName('');
+                  }}
+                  className="text-xs text-slate-400 hover:text-slate-600 px-1"
+                >
+                  キャンセル
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

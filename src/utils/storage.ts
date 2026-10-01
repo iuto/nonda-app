@@ -9,6 +9,9 @@ export const DEFAULT_SETTINGS: AppSettings = {
   toleranceMinutes: 30,
   remainingPills: 14, // デフォルト残数
   alertThreshold: 10,  // デフォルト閾値 (10個以下でアラート)
+  customItems: [
+    { id: 'extra-1', name: '朝食後の追加薬' }
+  ],
 };
 
 export function getTodayDateString(offsetDays = 0): string {
@@ -31,6 +34,7 @@ export function loadSettings(): AppSettings {
     return {
       ...DEFAULT_SETTINGS,
       ...parsed,
+      customItems: parsed.customItems || DEFAULT_SETTINGS.customItems,
     };
   } catch (e) {
     console.error('Failed to load settings from localStorage', e);
