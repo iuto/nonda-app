@@ -161,8 +161,8 @@ export const TimeEditModal: React.FC<TimeEditModalProps> = ({
                 onClick={() => setBleedingLevel('heavy')}
                 className={`py-2 rounded-xl text-xs font-bold border flex items-center justify-center space-x-1 ${
                   bleedingLevel === 'heavy'
-                    ? 'bg-rose-500 text-white border-rose-600'
-                    : 'bg-rose-100 text-rose-800 border-rose-200'
+                    ? 'bg-amber-600 text-white border-amber-700'
+                    : 'bg-amber-100 text-amber-800 border-amber-300'
                 }`}
               >
                 <span className="w-2 h-2 rounded-full bg-current"></span>

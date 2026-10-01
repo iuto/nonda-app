@@ -201,8 +201,8 @@ export const MainView: React.FC<MainViewProps> = ({
             onClick={() => onSetBleedingLevel('light')}
             className={`py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center space-x-1 ${
               currentBleedingLevel === 'light'
-                ? 'bg-amber-500 text-white shadow-xs'
-                : 'text-amber-700 hover:bg-amber-50/50'
+                ? 'bg-amber-400 text-white shadow-xs'
+                : 'text-amber-600 hover:bg-amber-50/50'
             }`}
           >
             <span className="w-2 h-2 rounded-full fill-current bg-current"></span>
@@ -212,8 +212,8 @@ export const MainView: React.FC<MainViewProps> = ({
             onClick={() => onSetBleedingLevel('moderate')}
             className={`py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center space-x-1 ${
               currentBleedingLevel === 'moderate'
-                ? 'bg-amber-600 text-white shadow-xs'
-                : 'text-amber-800 hover:bg-amber-50/50'
+                ? 'bg-amber-500 text-white shadow-xs'
+                : 'text-amber-700 hover:bg-amber-50/50'
             }`}
           >
             <span className="w-2 h-2 rounded-full bg-current"></span>
@@ -224,8 +224,8 @@ export const MainView: React.FC<MainViewProps> = ({
             onClick={() => onSetBleedingLevel('heavy')}
             className={`py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center space-x-1 ${
               currentBleedingLevel === 'heavy'
-                ? 'bg-rose-500 text-white shadow-xs'
-                : 'text-rose-700 hover:bg-rose-50/50'
+                ? 'bg-amber-600 text-white shadow-xs'
+                : 'text-amber-800 hover:bg-amber-50/50'
             }`}
           >
             <span className="w-2 h-2 rounded-full bg-current"></span>

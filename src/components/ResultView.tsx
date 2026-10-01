@@ -48,7 +48,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
       case 'moderate':
         return { label: '体調: レベル2', bgClass: 'bg-amber-500 text-white border-amber-600' };
       case 'heavy':
-        return { label: '体調: レベル3', bgClass: 'bg-rose-500 text-white border-rose-600' };
+        return { label: '体調: レベル3', bgClass: 'bg-amber-600 text-white border-amber-700' };
       default:
         return null;
     }
