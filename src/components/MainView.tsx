@@ -127,22 +127,18 @@ export const MainView: React.FC<MainViewProps> = ({
             {/* 超大型「のんだ！」主役モダンプレミアムボタン */}
             <button
               onClick={handleMainTakeNow}
-              className="group relative w-full max-w-2xl py-6 md:py-8 px-8 rounded-3xl bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 text-white font-black shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/35 hover:scale-[1.01] active:scale-[0.985] transition-all duration-200 flex items-center justify-center space-x-3.5 border border-white/25 overflow-hidden"
+              className="group relative w-full max-w-2xl py-7 md:py-9 px-8 rounded-3xl bg-gradient-to-r from-emerald-500 via-teal-600 to-emerald-600 text-white font-black shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/35 hover:scale-[1.015] active:scale-[0.985] transition-all duration-200 flex items-center justify-center space-x-4 border border-white/30 overflow-hidden"
             >
               {/* 上部の繊細な光芒ハイライト */}
               <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/20 via-white/5 to-transparent pointer-events-none rounded-t-3xl" />
 
               <div className="p-3 md:p-3.5 rounded-2xl bg-white/20 backdrop-blur-md group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 border border-white/30 shadow-inner shrink-0 relative z-10">
-                <CheckCircle2 className="w-9 h-9 md:w-12 md:h-12 stroke-[2.8] text-white drop-shadow-xs" />
+                <CheckCircle2 className="w-10 h-10 md:w-13 md:h-13 stroke-[2.8] text-white drop-shadow-xs" />
               </div>
 
-              <span className="text-3xl md:text-5xl tracking-wider font-black drop-shadow-xs relative z-10">
+              <span className="text-3xl md:text-5xl tracking-widest font-black drop-shadow-xs relative z-10">
                 のんだ！
               </span>
-
-              <div className="p-2 rounded-xl bg-white/10 group-hover:translate-x-0.5 transition-transform duration-300 relative z-10">
-                <Sparkles className="w-6 h-6 md:w-7 md:h-7 text-amber-200 animate-pulse" />
-              </div>
             </button>
 
             <button
