@@ -116,7 +116,7 @@ export const TimeEditModal: React.FC<TimeEditModalProps> = ({
           {/* 体調・副作用の程度 (マイルドなドット表示) */}
           <div className="pt-2 border-t border-slate-100 space-y-1.5">
             <div className="flex items-center space-x-1.5">
-              <Activity className="w-3.5 h-3.5 text-amber-600" />
+              <Activity className="w-3.5 h-3.5 text-orange-500" />
               <label className="block text-xs font-bold text-slate-700">
                 体調・副作用の程度
               </label>
@@ -138,8 +138,8 @@ export const TimeEditModal: React.FC<TimeEditModalProps> = ({
                 onClick={() => setBleedingLevel('light')}
                 className={`py-2 rounded-xl text-xs font-bold border flex items-center justify-center space-x-1 ${
                   bleedingLevel === 'light'
-                    ? 'bg-amber-500 text-white border-amber-600'
-                    : 'bg-amber-50 text-amber-700 border-amber-200'
+                    ? 'bg-orange-400 text-white border-orange-500'
+                    : 'bg-orange-50 text-orange-600 border-orange-200'
                 }`}
               >
                 <span className="w-2 h-2 rounded-full bg-current"></span>
@@ -149,8 +149,8 @@ export const TimeEditModal: React.FC<TimeEditModalProps> = ({
                 onClick={() => setBleedingLevel('moderate')}
                 className={`py-2 rounded-xl text-xs font-bold border flex items-center justify-center space-x-1 ${
                   bleedingLevel === 'moderate'
-                    ? 'bg-amber-600 text-white border-amber-700'
-                    : 'bg-amber-100 text-amber-800 border-amber-300'
+                    ? 'bg-orange-500 text-white border-orange-600'
+                    : 'bg-orange-100 text-orange-700 border-orange-300'
                 }`}
               >
                 <span className="w-2 h-2 rounded-full bg-current"></span>
@@ -161,8 +161,8 @@ export const TimeEditModal: React.FC<TimeEditModalProps> = ({
                 onClick={() => setBleedingLevel('heavy')}
                 className={`py-2 rounded-xl text-xs font-bold border flex items-center justify-center space-x-1 ${
                   bleedingLevel === 'heavy'
-                    ? 'bg-amber-600 text-white border-amber-700'
-                    : 'bg-amber-100 text-amber-800 border-amber-300'
+                    ? 'bg-orange-600 text-white border-orange-700'
+                    : 'bg-orange-100 text-orange-800 border-orange-300'
                 }`}
               >
                 <span className="w-2 h-2 rounded-full bg-current"></span>

@@ -44,11 +44,11 @@ export const ResultView: React.FC<ResultViewProps> = ({
     const activeLevel = level ?? (legacyHasBleeding ? 'light' : 'none');
     switch (activeLevel) {
       case 'light':
-        return { label: '体調: レベル1', bgClass: 'bg-amber-100 text-amber-800 border-amber-300' };
+        return { label: '体調: レベル1', bgClass: 'bg-orange-100 text-orange-800 border-orange-300' };
       case 'moderate':
-        return { label: '体調: レベル2', bgClass: 'bg-amber-500 text-white border-amber-600' };
+        return { label: '体調: レベル2', bgClass: 'bg-orange-400 text-white border-orange-500' };
       case 'heavy':
-        return { label: '体調: レベル3', bgClass: 'bg-amber-600 text-white border-amber-700' };
+        return { label: '体調: レベル3', bgClass: 'bg-orange-500 text-white border-orange-600' };
       default:
         return null;
     }
@@ -89,12 +89,12 @@ export const ResultView: React.FC<ResultViewProps> = ({
           <p className="text-[10px] md:text-xs text-emerald-600">順調な服薬割合</p>
         </div>
 
-        <div className="bg-amber-50/80 rounded-2xl p-4 text-center space-y-0.5 border border-amber-100">
-          <p className="text-xs font-semibold text-amber-800">症状・体調記録</p>
-          <p className="text-2xl md:text-3xl font-black text-amber-950">
-            {bleedingDaysCount}<span className="text-xs font-bold text-amber-800">日</span>
+        <div className="bg-orange-50/80 rounded-2xl p-4 text-center space-y-0.5 border border-orange-100">
+          <p className="text-xs font-semibold text-orange-800">症状・体調記録</p>
+          <p className="text-2xl md:text-3xl font-black text-orange-950">
+            {bleedingDaysCount}<span className="text-xs font-bold text-orange-800">日</span>
           </p>
-          <p className="text-[10px] md:text-xs text-amber-700">副作用等の記録合計</p>
+          <p className="text-[10px] md:text-xs text-orange-700">副作用等の記録合計</p>
         </div>
       </div>
 
@@ -103,7 +103,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
         <span className="font-semibold text-slate-700">凡例:</span>
         <div className="flex items-center space-x-3 text-xs">
           <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block mr-1.5"></span>時間通り</span>
-          <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block mr-1.5"></span>体調変化記録</span>
+          <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-orange-400 inline-block mr-1.5"></span>体調変化記録</span>
           <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-teal-600 inline-block mr-1.5"></span>💊 追加薬あり</span>
         </div>
       </div>
@@ -130,7 +130,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
                 <div
                   key={log.id}
                   className={`bg-white rounded-2xl p-4 border shadow-xs transition-all space-y-3 ${
-                    bleedingBadge ? 'border-amber-200 ring-1 ring-amber-100' : 'border-slate-100 hover:border-emerald-200'
+                    bleedingBadge ? 'border-orange-200 ring-1 ring-orange-100' : 'border-slate-100 hover:border-emerald-200'
                   }`}
                 >
                   <div className="flex items-center justify-between">

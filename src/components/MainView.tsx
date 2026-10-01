@@ -177,7 +177,7 @@ export const MainView: React.FC<MainViewProps> = ({
       {/* 🌿 体調・副作用の記録 ＆ 朝食後の追加薬 カード */}
       <div className="bg-white/90 backdrop-blur-md rounded-3xl p-5 border border-slate-100 shadow-sm space-y-4">
         <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100">
+          <div className="w-8 h-8 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center border border-orange-100">
             <Activity className="w-4 h-4" />
           </div>
           <div>
@@ -201,8 +201,8 @@ export const MainView: React.FC<MainViewProps> = ({
             onClick={() => onSetBleedingLevel('light')}
             className={`py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center space-x-1 ${
               currentBleedingLevel === 'light'
-                ? 'bg-amber-400 text-white shadow-xs'
-                : 'text-amber-600 hover:bg-amber-50/50'
+                ? 'bg-orange-400 text-white shadow-xs'
+                : 'text-orange-400 hover:bg-orange-50/50'
             }`}
           >
             <span className="w-2 h-2 rounded-full fill-current bg-current"></span>
@@ -212,8 +212,8 @@ export const MainView: React.FC<MainViewProps> = ({
             onClick={() => onSetBleedingLevel('moderate')}
             className={`py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center space-x-1 ${
               currentBleedingLevel === 'moderate'
-                ? 'bg-amber-500 text-white shadow-xs'
-                : 'text-amber-700 hover:bg-amber-50/50'
+                ? 'bg-orange-500 text-white shadow-xs'
+                : 'text-orange-500 hover:bg-orange-50/50'
             }`}
           >
             <span className="w-2 h-2 rounded-full bg-current"></span>
@@ -224,8 +224,8 @@ export const MainView: React.FC<MainViewProps> = ({
             onClick={() => onSetBleedingLevel('heavy')}
             className={`py-2 rounded-xl text-xs font-bold transition-all duration-200 flex items-center justify-center space-x-1 ${
               currentBleedingLevel === 'heavy'
-                ? 'bg-amber-600 text-white shadow-xs'
-                : 'text-amber-800 hover:bg-amber-50/50'
+                ? 'bg-orange-600 text-white shadow-xs'
+                : 'text-orange-600 hover:bg-orange-50/50'
             }`}
           >
             <span className="w-2 h-2 rounded-full bg-current"></span>
