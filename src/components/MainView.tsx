@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Clock, Edit3, RotateCcw, Pill, AlertTriangle, Plus, Check, Activity, Sparkles, Trash2 } from 'lucide-react';
+import { CheckCircle2, Clock, Edit3, RotateCcw, Pill, AlertTriangle, Plus, Check, Activity, Sparkles, Trash2, X } from 'lucide-react';
 import { AppSettings, MedicationLog, BleedingLevel } from '../types/medication';
 import { getDeviationStatus } from '../utils/recommendation';
 import { triggerCelebrationConfetti } from '../utils/confetti';
@@ -7,6 +7,8 @@ import { triggerCelebrationConfetti } from '../utils/confetti';
 interface MainViewProps {
   todayLog: MedicationLog;
   settings: AppSettings;
+  isAlertDismissed?: boolean;
+  onDismissAlert?: () => void;
   onTakeNow: () => void;
   onCancelTake: () => void;
   onSetBleedingLevel: (level: BleedingLevel) => void;
@@ -21,6 +23,8 @@ interface MainViewProps {
 export const MainView: React.FC<MainViewProps> = ({
   todayLog,
   settings,
+  isAlertDismissed,
+  onDismissAlert,
   onTakeNow,
   onCancelTake,
   onSetBleedingLevel,
@@ -56,7 +60,7 @@ export const MainView: React.FC<MainViewProps> = ({
   
   const currentBleedingLevel: BleedingLevel = todayLog.bleedingLevel ?? (todayLog.hasBleeding ? 'light' : 'none');
 
-  const isLowPills = settings.remainingPills <= settings.alertThreshold;
+  const isLowPills = settings.remainingPills <= settings.alertThreshold && !isAlertDismissed;
 
   const handleMainTakeNow = () => {
     triggerCelebrationConfetti();
@@ -97,13 +101,24 @@ export const MainView: React.FC<MainViewProps> = ({
 
   return (
     <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 space-y-5">
-      {/* ⚠️ 残薬警告カード */}
+      {/* ⚠️ 残薬警告カード (閉じるXボタン付き) */}
       {isLowPills && (
-        <div className="bg-amber-500 text-white rounded-2xl p-4 shadow-lg shadow-amber-500/15 border border-amber-400 flex items-center justify-center space-x-2.5 text-center animate-in fade-in slide-in-from-top-2">
-          <AlertTriangle className="w-5 h-5 text-amber-100 shrink-0" />
-          <p className="font-bold text-sm md:text-base tracking-tight">
-            薬の残りがあと <span className="text-lg md:text-xl font-black underline decoration-2">{settings.remainingPills}個</span> になりました！
-          </p>
+        <div className="bg-amber-500 text-white rounded-2xl p-4 shadow-lg shadow-amber-500/15 border border-amber-400 flex items-center justify-between text-center animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-center space-x-2.5 mx-auto">
+            <AlertTriangle className="w-5 h-5 text-amber-100 shrink-0" />
+            <p className="font-bold text-sm md:text-base tracking-tight">
+              薬の残りがあと <span className="text-lg md:text-xl font-black underline decoration-2">{settings.remainingPills}個</span> になりました！
+            </p>
+          </div>
+          {onDismissAlert && (
+            <button
+              onClick={onDismissAlert}
+              className="p-1 rounded-lg text-amber-100 hover:text-white hover:bg-amber-600/50 transition-colors shrink-0"
+              title="この警告を閉じる"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
       )}
 

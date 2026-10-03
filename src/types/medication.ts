@@ -17,6 +17,7 @@ export interface MedicationLog {
   extraTakenTime?: string | null; // 朝食後追加薬の服用時刻 (互換用)
   extraTakenAt?: string | null;
   customLogs?: Record<string, string | null>; // itemId -> 服用時刻 (HH:mm)
+  customItemNames?: Record<string, string>; // itemId -> 服用当時の名称
   note?: string;
 }
 

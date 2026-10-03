@@ -8,6 +8,7 @@ import {
   getTodayDateString,
   getOrCreateLogForDate,
 } from './utils/storage';
+import { calculateDiffMinutes } from './utils/recommendation';
 import { Header } from './components/Header';
 import { MainView } from './components/MainView';
 import { ResultView } from './components/ResultView';
@@ -15,21 +16,10 @@ import { TimeEditModal } from './components/TimeEditModal';
 
 export function App() {
   const [settings, setSettings] = useState<AppSettings>(loadSettings);
-  const [logs, setLogs] = useState<MedicationLog[]>(() => {
-    const loaded = loadLogs();
-    // 既存ログの過剰な差分（マイナス数百〜プラス数百分のズレ）を「時間通り」に自動修正
-    return loaded.map((log) => {
-      if (log.takenTime) {
-        return {
-          ...log,
-          targetTime: log.takenTime, // 目標時間を服用時刻に合わせる
-          diffMinutes: 0, // ズレ0分（時間通り）
-        };
-      }
-      return log;
-    });
-  });
+  const [logs, setLogs] = useState<MedicationLog[]>(loadLogs);
   const [currentTab, setCurrentTab] = useState<'main' | 'result'>('main');
+
+  const [isAlertDismissed, setIsAlertDismissed] = useState(false);
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingLog, setEditingLog] = useState<MedicationLog | null>(null);
@@ -51,32 +41,34 @@ export function App() {
     const newSettings = { ...settings, remainingPills: newCount };
     setSettings(newSettings);
     saveSettings(newSettings);
+    // 薬の残数が変化したらアラート消去フラグをリセットして再表示可能に
+    setIsAlertDismissed(false);
   };
 
-  // 服薬「飲んだ！」アクション（記録した時間を目標時間として基準化し、ズレていない「時間通り」とする）
+  // 服薬「飲んだ！」アクション（設定された目標時間との実際のズレ分を計算）
   const handleTakeNow = () => {
     const now = new Date();
     const hh = String(now.getHours()).padStart(2, '0');
     const mm = String(now.getMinutes()).padStart(2, '0');
     const takenTimeStr = `${hh}:${mm}`;
 
-    // 服用した時刻をそのユーザーの基本服用時刻として記録（ズレ0分）
+    // 設定目標時刻との差分（分）を正確に算出
+    const diffMinutes = calculateDiffMinutes(settings.targetTime, takenTimeStr);
+
     const updatedLog: MedicationLog = {
       ...todayLog,
-      targetTime: takenTimeStr,
+      targetTime: settings.targetTime,
       takenTime: takenTimeStr,
       takenAt: now.toISOString(),
-      diffMinutes: 0, // ズレていない「時間通り」
+      diffMinutes: diffMinutes,
     };
-
-    // settingsのデフォルト目標時間もこのユーザーの服用時間へ自動同期
-    const newSettings = { ...settings, targetTime: takenTimeStr };
-    setSettings(newSettings);
-    saveSettings(newSettings);
 
     const newLogs = logs.map((l) => (l.date === todayDateStr ? updatedLog : l));
     setLogs(newLogs);
     saveLogs(newLogs);
+
+    // 薬を飲んだらアラートを再表示できるようにリセット
+    setIsAlertDismissed(false);
 
     if (!todayLog.takenTime) {
       updatePills(-1);
@@ -137,6 +129,7 @@ export function App() {
     const newSettings = { ...settings, remainingPills: Math.max(0, count) };
     setSettings(newSettings);
     saveSettings(newSettings);
+    setIsAlertDismissed(false);
   };
 
   const handleSaveTime = (
@@ -175,13 +168,14 @@ export function App() {
         note: finalNote,
       };
     } else {
-      // 指定された時間で目標と服用時刻を同期して「ズレ0分（時間通り）」とする
+      // 実際に指定された時間での偏差を算出
+      const diffMinutes = calculateDiffMinutes(settings.targetTime, takenTime);
       updatedLog = {
         ...targetLog,
-        targetTime: takenTime,
+        targetTime: settings.targetTime,
         takenTime: takenTime,
         takenAt: new Date().toISOString(),
-        diffMinutes: 0,
+        diffMinutes: diffMinutes,
         bleedingLevel: finalLevel,
         hasBleeding: finalLevel !== 'none',
         extraTakenTime: extraTakenTime !== undefined ? extraTakenTime : targetLog.extraTakenTime,
@@ -225,6 +219,12 @@ export function App() {
     let newCustomLogs = { ...currentCustomLogs };
     let extraTakenTime = targetLog.extraTakenTime;
 
+    const currentItems = settings.customItems || [{ id: 'extra-1', name: '朝食後の追加薬' }];
+    const itemObj = currentItems.find((i) => i.id === itemId);
+    const itemName = itemObj ? itemObj.name : (itemId === 'extra-1' ? '朝食後の追加薬' : '追加のお薬・サプリ');
+
+    let newCustomItemNames = { ...(targetLog.customItemNames || {}) };
+
     if (isTaken) {
       delete newCustomLogs[itemId];
       if (itemId === 'extra-1') {
@@ -236,6 +236,7 @@ export function App() {
       const mm = String(now.getMinutes()).padStart(2, '0');
       const takenTimeStr = `${hh}:${mm}`;
       newCustomLogs[itemId] = takenTimeStr;
+      newCustomItemNames[itemId] = itemName;
       if (itemId === 'extra-1') {
         extraTakenTime = takenTimeStr;
       }
@@ -245,6 +246,7 @@ export function App() {
       ...targetLog,
       extraTakenTime,
       customLogs: newCustomLogs,
+      customItemNames: newCustomItemNames,
     };
 
     const exists = logs.some((l) => l.date === todayDateStr);
@@ -273,6 +275,8 @@ export function App() {
           <MainView
             todayLog={todayLog}
             settings={settings}
+            isAlertDismissed={isAlertDismissed}
+            onDismissAlert={() => setIsAlertDismissed(true)}
             onTakeNow={handleTakeNow}
             onCancelTake={handleCancelTake}
             onSetBleedingLevel={(level) => handleSetBleedingLevel(todayDateStr, level)}

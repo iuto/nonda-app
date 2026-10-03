@@ -209,7 +209,8 @@ export const ResultView: React.FC<ResultViewProps> = ({
                         return entries.map(([itemId, time]) => {
                           if (!time) return null;
                           const itemObj = settings?.customItems?.find((i: CustomMedicationItem) => i.id === itemId);
-                          const itemName = itemObj ? itemObj.name : (itemId === 'extra-1' ? '朝食後の追加薬' : '追加のお薬・サプリ');
+                          const savedName = log.customItemNames?.[itemId];
+                          const itemName = itemObj ? itemObj.name : (savedName || (itemId === 'extra-1' ? '朝食後の追加薬' : '追加のお薬・サプリ'));
                           return (
                             <div key={itemId} className="pt-1 border-t border-slate-200/60 flex items-center justify-between text-emerald-800 font-semibold">
                               <span className="flex items-center space-x-1">
