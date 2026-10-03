@@ -78,27 +78,35 @@ export const ResultView: React.FC<ResultViewProps> = ({
       {/* サマリーカード */}
       <div className="bg-white rounded-3xl p-6 border border-emerald-100 shadow-sm grid grid-cols-3 gap-4">
         <div className="bg-emerald-50/80 rounded-2xl p-4 text-center space-y-0.5 border border-emerald-100">
-          <p className="text-xs font-semibold text-emerald-700">平均ズレ時間</p>
+          <p className="text-xs font-semibold text-emerald-700">飲む時間のズレ</p>
           <p className="text-2xl md:text-3xl font-black text-emerald-950">
-            ±{averageDiffMinutes}<span className="text-xs font-bold text-emerald-700">分</span>
+            {totalTaken === 0 ? (
+              <span className="text-base md:text-lg font-bold text-slate-400">記録なし</span>
+            ) : averageDiffMinutes === 0 ? (
+              <span className="text-xl md:text-2xl font-bold text-emerald-800">ほぼピッタリ</span>
+            ) : (
+              <>
+                約{averageDiffMinutes}<span className="text-xs font-bold text-emerald-700">分</span>
+              </>
+            )}
           </p>
-          <p className="text-[10px] md:text-xs text-emerald-600">目標との平均偏差</p>
+          <p className="text-[10px] md:text-xs text-emerald-600">目標時間からの差</p>
         </div>
 
         <div className="bg-emerald-50/80 rounded-2xl p-4 text-center space-y-0.5 border border-emerald-100">
-          <p className="text-xs font-semibold text-emerald-700">定刻服用率</p>
+          <p className="text-xs font-semibold text-emerald-700">時間通り飲めた率</p>
           <p className="text-2xl md:text-3xl font-black text-emerald-950">
             {perfectRate}<span className="text-xs font-bold text-emerald-700">%</span>
           </p>
-          <p className="text-[10px] md:text-xs text-emerald-600">順調な服薬割合</p>
+          <p className="text-[10px] md:text-xs text-emerald-600">予定通りの達成率</p>
         </div>
 
         <div className="bg-orange-50/80 rounded-2xl p-4 text-center space-y-0.5 border border-orange-100">
-          <p className="text-xs font-semibold text-orange-800">症状・体調記録</p>
+          <p className="text-xs font-semibold text-orange-800">体調メモ・症状</p>
           <p className="text-2xl md:text-3xl font-black text-orange-950">
             {bleedingDaysCount}<span className="text-xs font-bold text-orange-800">日</span>
           </p>
-          <p className="text-[10px] md:text-xs text-orange-700">副作用等の記録合計</p>
+          <p className="text-[10px] md:text-xs text-orange-700">記録をつけた合計日数</p>
         </div>
       </div>
 
