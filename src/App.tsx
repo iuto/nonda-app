@@ -148,6 +148,16 @@ export function App() {
   ) => {
     const targetLog = logs.find((l) => l.date === dateStr) || getOrCreateLogForDate(dateStr, settings.targetTime, logs);
 
+    // 変更前の服用状態と変更後の服用状態の差分をチェックして残り薬数を連動更新
+    const wasTaken = !!targetLog.takenTime;
+    const willBeTaken = takenTime !== null;
+
+    if (!wasTaken && willBeTaken) {
+      updatePills(-1);
+    } else if (wasTaken && !willBeTaken) {
+      updatePills(1);
+    }
+
     let updatedLog: MedicationLog;
 
     const finalLevel = bleedingLevel ?? targetLog.bleedingLevel ?? (targetLog.hasBleeding ? 'light' : 'none');
