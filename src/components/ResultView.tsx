@@ -33,7 +33,6 @@ export const ResultView: React.FC<ResultViewProps> = ({
   const averageTakenTime = calculateAverageTakenTime(logs, 7);
 
   let averageDiffMinutes = 0;
-  let perfectCount = 0;
 
   if (recentDaysCount > 0 && averageTakenTime) {
     const sumDiff = recentTakenLogs.reduce((sum, l) => {
@@ -41,13 +40,8 @@ export const ResultView: React.FC<ResultViewProps> = ({
       return sum + diff;
     }, 0);
     averageDiffMinutes = Math.round(sumDiff / recentDaysCount);
-    perfectCount = recentTakenLogs.filter((l) => {
-      const diff = Math.abs(calculateDiffMinutes(averageTakenTime, l.takenTime!));
-      return diff <= 25;
-    }).length;
   }
 
-  const perfectRate = recentDaysCount > 0 ? Math.round((perfectCount / recentDaysCount) * 100) : 100;
   const bleedingDaysCount = logs.filter((l) => (l.bleedingLevel && l.bleedingLevel !== 'none') || l.hasBleeding || (l.note && l.note.trim() !== '')).length;
 
   const formatDateLabel = (dateStr: string) => {
@@ -121,7 +115,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
           </div>
         </div>
 
-        {/* ② 飲む時間のズレ & ペース維持率カード */}
+        {/* ② 飲む時間のズレ カード */}
         <div className="relative overflow-hidden rounded-2xl p-3 md:p-4 bg-gradient-to-b from-teal-50/90 via-teal-50/30 to-white border border-teal-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between">
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-[11px] md:text-xs font-bold text-teal-800 flex items-center space-x-1.5">
@@ -130,11 +124,6 @@ export const ResultView: React.FC<ResultViewProps> = ({
               </span>
               <span className="truncate">飲む時間のズレ</span>
             </span>
-            {recentDaysCount > 0 && averageTakenTime && (
-              <span className="hidden sm:inline-block text-[9px] md:text-[10px] font-bold px-1.5 md:px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 border border-teal-200/60 shadow-xs">
-                維持率 {perfectRate}%
-              </span>
-            )}
           </div>
 
           <div className="my-1 text-center">
@@ -153,22 +142,10 @@ export const ResultView: React.FC<ResultViewProps> = ({
             )}
           </div>
 
-          {/* ミニ進捗バー & サブテキスト */}
-          <div className="mt-1.5 pt-1.5 border-t border-teal-100/70 space-y-1">
-            <div className="flex items-center justify-between text-[10px] md:text-[11px] text-teal-700/80 font-medium">
-              <span className="truncate">直近の平均差</span>
-              <span className="font-bold text-teal-800 text-[10px] md:text-[11px] shrink-0">
-                {recentDaysCount > 0 && averageTakenTime ? `±${averageDiffMinutes}分` : '-'}
-              </span>
-            </div>
-            {recentDaysCount > 0 && averageTakenTime && (
-              <div className="w-full bg-teal-100/80 h-1 md:h-1.5 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-500 transition-all duration-500"
-                  style={{ width: `${perfectRate}%` }}
-                />
-              </div>
-            )}
+          <div className="mt-1.5 pt-1.5 border-t border-teal-100/70 text-center">
+            <span className="text-[10px] md:text-[11px] font-medium text-teal-700/80 truncate block">
+              普段の時間との差（平均）
+            </span>
           </div>
         </div>
 
