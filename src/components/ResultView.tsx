@@ -84,45 +84,114 @@ export const ResultView: React.FC<ResultViewProps> = ({
       </div>
 
       {/* サマリーカード */}
-      <div className="bg-white rounded-3xl p-6 border border-emerald-100 shadow-sm grid grid-cols-3 gap-4">
-        <div className="bg-emerald-50/80 rounded-2xl p-4 text-center space-y-0.5 border border-emerald-100">
-          <p className="text-xs font-semibold text-emerald-700">普段飲む時間</p>
-          <p className="text-2xl md:text-3xl font-black text-emerald-950">
+      <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-4 md:p-6 border border-emerald-100/90 shadow-sm shadow-emerald-500/5 grid grid-cols-3 gap-2.5 md:gap-4">
+        {/* ① 普段飲む時間カード */}
+        <div className="relative overflow-hidden rounded-2xl p-3 md:p-4 bg-gradient-to-b from-emerald-50/90 via-emerald-50/30 to-white border border-emerald-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[11px] md:text-xs font-bold text-emerald-800 flex items-center space-x-1.5">
+              <span className="w-5 h-5 md:w-6 md:h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                <Clock className="w-3 h-3 md:w-3.5 md:h-3.5 stroke-[2.4]" />
+              </span>
+              <span className="truncate">普段飲む時間</span>
+            </span>
+          </div>
+
+          <div className="my-1 text-center">
             {averageTakenTime ? (
-              <>
-                {averageTakenTime}<span className="text-xs font-bold text-emerald-700">頃</span>
-              </>
+              <div className="flex items-baseline justify-center space-x-0.5">
+                <span className="text-xl md:text-3xl font-black text-slate-800 tracking-tight">
+                  {averageTakenTime}
+                </span>
+                <span className="text-[10px] md:text-xs font-bold text-emerald-700">頃</span>
+              </div>
             ) : (
-              <span className="text-base md:text-lg font-bold text-slate-400">記録なし</span>
+              <span className="text-sm md:text-base font-bold text-slate-400">記録なし</span>
             )}
-          </p>
-          <p className="text-[10px] md:text-xs text-emerald-600">直近の平均服薬時刻</p>
+          </div>
+
+          <div className="mt-1.5 pt-1.5 border-t border-emerald-100/70 text-center">
+            <span className="text-[10px] md:text-[11px] font-medium text-emerald-700/80 truncate block">
+              直近の平均服薬時刻
+            </span>
+          </div>
         </div>
 
-        <div className="bg-emerald-50/80 rounded-2xl p-4 text-center space-y-0.5 border border-emerald-100">
-          <p className="text-xs font-semibold text-emerald-700">飲む時間のズレ</p>
-          <p className="text-2xl md:text-3xl font-black text-emerald-950">
+        {/* ② 飲む時間のズレ & ペース維持率カード */}
+        <div className="relative overflow-hidden rounded-2xl p-3 md:p-4 bg-gradient-to-b from-teal-50/90 via-teal-50/30 to-white border border-teal-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[11px] md:text-xs font-bold text-teal-800 flex items-center space-x-1.5">
+              <span className="w-5 h-5 md:w-6 md:h-6 rounded-lg bg-teal-100 text-teal-700 flex items-center justify-center shrink-0">
+                <Sparkles className="w-3 h-3 md:w-3.5 md:h-3.5 stroke-[2.4]" />
+              </span>
+              <span className="truncate">飲む時間のズレ</span>
+            </span>
+            {totalTaken > 0 && averageTakenTime && (
+              <span className="hidden sm:inline-block text-[9px] md:text-[10px] font-bold px-1.5 md:px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 border border-teal-200/60 shadow-xs">
+                維持率 {perfectRate}%
+              </span>
+            )}
+          </div>
+
+          <div className="my-1 text-center">
             {totalTaken === 0 || !averageTakenTime ? (
-              <span className="text-base md:text-lg font-bold text-slate-400">記録なし</span>
+              <span className="text-sm md:text-base font-bold text-slate-400">記録なし</span>
             ) : averageDiffMinutes === 0 ? (
-              <span className="text-xl md:text-2xl font-bold text-emerald-800">ほぼピッタリ</span>
+              <span className="text-lg md:text-2xl font-black text-teal-800">ほぼピッタリ</span>
             ) : (
-              <>
-                約{averageDiffMinutes}<span className="text-xs font-bold text-emerald-700">分</span>
-              </>
+              <div className="flex items-baseline justify-center space-x-0.5">
+                <span className="text-[10px] md:text-xs font-bold text-teal-700 mr-0.5">約</span>
+                <span className="text-xl md:text-3xl font-black text-slate-800 tracking-tight">
+                  {averageDiffMinutes}
+                </span>
+                <span className="text-[10px] md:text-xs font-bold text-teal-700">分</span>
+              </div>
             )}
-          </p>
-          <p className="text-[10px] md:text-xs text-emerald-600">
-            {totalTaken === 0 || !averageTakenTime ? '普段の時間との平均差' : `普段との差 (維持率 ${perfectRate}%)`}
-          </p>
+          </div>
+
+          {/* ミニ進捗バー & サブテキスト */}
+          <div className="mt-1.5 pt-1.5 border-t border-teal-100/70 space-y-1">
+            <div className="flex items-center justify-between text-[10px] md:text-[11px] text-teal-700/80 font-medium">
+              <span className="truncate">普段との差</span>
+              <span className="font-bold text-teal-800 text-[10px] md:text-[11px] shrink-0">
+                {totalTaken > 0 && averageTakenTime ? `±${averageDiffMinutes}分` : '-'}
+              </span>
+            </div>
+            {totalTaken > 0 && averageTakenTime && (
+              <div className="w-full bg-teal-100/80 h-1 md:h-1.5 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-500 transition-all duration-500"
+                  style={{ width: `${perfectRate}%` }}
+                />
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="bg-orange-50/80 rounded-2xl p-4 text-center space-y-0.5 border border-orange-100">
-          <p className="text-xs font-semibold text-orange-800">体調メモ・症状</p>
-          <p className="text-2xl md:text-3xl font-black text-orange-950">
-            {bleedingDaysCount}<span className="text-xs font-bold text-orange-800">日</span>
-          </p>
-          <p className="text-[10px] md:text-xs text-orange-700">記録をつけた合計日数</p>
+        {/* ③ 体調メモ・症状カード */}
+        <div className="relative overflow-hidden rounded-2xl p-3 md:p-4 bg-gradient-to-b from-amber-50/90 via-orange-50/30 to-white border border-amber-200/70 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[11px] md:text-xs font-bold text-amber-900 flex items-center space-x-1.5">
+              <span className="w-5 h-5 md:w-6 md:h-6 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                <FileText className="w-3 h-3 md:w-3.5 md:h-3.5 stroke-[2.4]" />
+              </span>
+              <span className="truncate">体調メモ・症状</span>
+            </span>
+          </div>
+
+          <div className="my-1 text-center">
+            <div className="flex items-baseline justify-center space-x-0.5">
+              <span className="text-xl md:text-3xl font-black text-slate-800 tracking-tight">
+                {bleedingDaysCount}
+              </span>
+              <span className="text-[10px] md:text-xs font-bold text-amber-800">日</span>
+            </div>
+          </div>
+
+          <div className="mt-1.5 pt-1.5 border-t border-amber-100/80 text-center">
+            <span className="text-[10px] md:text-[11px] font-medium text-amber-800/80 truncate block">
+              記録をつけた合計日数
+            </span>
+          </div>
         </div>
       </div>
 
