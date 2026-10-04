@@ -23,26 +23,31 @@ export const ResultView: React.FC<ResultViewProps> = ({
   const sortedLogs = [...logs].sort((a, b) => b.date.localeCompare(a.date));
 
   const takenLogs = logs.filter((l) => l.takenTime !== null);
-  const totalTaken = takenLogs.length;
 
-  const averageTakenTime = calculateAverageTakenTime(logs);
+  // 直近最大7日分の服薬実績ログ
+  const recentTakenLogs = [...takenLogs]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 7);
+  const recentDaysCount = recentTakenLogs.length;
+
+  const averageTakenTime = calculateAverageTakenTime(logs, 7);
 
   let averageDiffMinutes = 0;
   let perfectCount = 0;
 
-  if (totalTaken > 0 && averageTakenTime) {
-    const sumDiff = takenLogs.reduce((sum, l) => {
+  if (recentDaysCount > 0 && averageTakenTime) {
+    const sumDiff = recentTakenLogs.reduce((sum, l) => {
       const diff = Math.abs(calculateDiffMinutes(averageTakenTime, l.takenTime!));
       return sum + diff;
     }, 0);
-    averageDiffMinutes = Math.round(sumDiff / totalTaken);
-    perfectCount = takenLogs.filter((l) => {
+    averageDiffMinutes = Math.round(sumDiff / recentDaysCount);
+    perfectCount = recentTakenLogs.filter((l) => {
       const diff = Math.abs(calculateDiffMinutes(averageTakenTime, l.takenTime!));
       return diff <= 25;
     }).length;
   }
 
-  const perfectRate = totalTaken > 0 ? Math.round((perfectCount / totalTaken) * 100) : 100;
+  const perfectRate = recentDaysCount > 0 ? Math.round((perfectCount / recentDaysCount) * 100) : 100;
   const bleedingDaysCount = logs.filter((l) => (l.bleedingLevel && l.bleedingLevel !== 'none') || l.hasBleeding || (l.note && l.note.trim() !== '')).length;
 
   const formatDateLabel = (dateStr: string) => {
@@ -111,7 +116,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
 
           <div className="mt-1.5 pt-1.5 border-t border-emerald-100/70 text-center">
             <span className="text-[10px] md:text-[11px] font-medium text-emerald-700/80 truncate block">
-              直近の平均服薬時刻
+              {recentDaysCount > 0 ? `直近${recentDaysCount}日間の平均服薬時刻` : '直近の平均服薬時刻'}
             </span>
           </div>
         </div>
@@ -125,7 +130,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
               </span>
               <span className="truncate">飲む時間のズレ</span>
             </span>
-            {totalTaken > 0 && averageTakenTime && (
+            {recentDaysCount > 0 && averageTakenTime && (
               <span className="hidden sm:inline-block text-[9px] md:text-[10px] font-bold px-1.5 md:px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 border border-teal-200/60 shadow-xs">
                 維持率 {perfectRate}%
               </span>
@@ -133,7 +138,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
           </div>
 
           <div className="my-1 text-center">
-            {totalTaken === 0 || !averageTakenTime ? (
+            {recentDaysCount === 0 || !averageTakenTime ? (
               <span className="text-sm md:text-base font-bold text-slate-400">記録なし</span>
             ) : averageDiffMinutes === 0 ? (
               <span className="text-lg md:text-2xl font-black text-teal-800">ほぼピッタリ</span>
@@ -151,12 +156,12 @@ export const ResultView: React.FC<ResultViewProps> = ({
           {/* ミニ進捗バー & サブテキスト */}
           <div className="mt-1.5 pt-1.5 border-t border-teal-100/70 space-y-1">
             <div className="flex items-center justify-between text-[10px] md:text-[11px] text-teal-700/80 font-medium">
-              <span className="truncate">普段との差</span>
+              <span className="truncate">直近の平均差</span>
               <span className="font-bold text-teal-800 text-[10px] md:text-[11px] shrink-0">
-                {totalTaken > 0 && averageTakenTime ? `±${averageDiffMinutes}分` : '-'}
+                {recentDaysCount > 0 && averageTakenTime ? `±${averageDiffMinutes}分` : '-'}
               </span>
             </div>
-            {totalTaken > 0 && averageTakenTime && (
+            {recentDaysCount > 0 && averageTakenTime && (
               <div className="w-full bg-teal-100/80 h-1 md:h-1.5 rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-500 transition-all duration-500"

@@ -25,7 +25,7 @@ export function App() {
   const [editingLog, setEditingLog] = useState<MedicationLog | null>(null);
 
   const todayDateStr = getTodayDateString(0);
-  const averageTakenTime = calculateAverageTakenTime(logs);
+  const averageTakenTime = calculateAverageTakenTime(logs, 7);
   const rawTodayLog = getOrCreateLogForDate(todayDateStr, settings.targetTime, logs);
   const todayLog: MedicationLog = {
     ...rawTodayLog,

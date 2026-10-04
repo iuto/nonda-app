@@ -26,14 +26,17 @@ export function calculateDiffMinutes(targetTime: string, takenTime: string): num
 }
 
 /**
- * 服薬実績ログから平均服用時刻（HH:mm）を算出（円周平均で日付跨ぎにも対応）
+ * 服薬実績ログから直近数日（最大recentLimit日分）の平均服用時刻（HH:mm）を算出（円周平均で日付跨ぎにも対応）
  */
-export function calculateAverageTakenTime(logs: MedicationLog[]): string | null {
-  const takenTimes = logs
-    .map((l) => l.takenTime)
-    .filter((t): t is string => !!t);
+export function calculateAverageTakenTime(logs: MedicationLog[], recentLimit: number = 7): string | null {
+  const sortedTakenLogs = [...logs]
+    .filter((l) => !!l.takenTime)
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, recentLimit);
 
-  if (takenTimes.length === 0) return null;
+  if (sortedTakenLogs.length === 0) return null;
+
+  const takenTimes = sortedTakenLogs.map((l) => l.takenTime!);
 
   let sinSum = 0;
   let cosSum = 0;
