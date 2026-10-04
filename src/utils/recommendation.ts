@@ -25,6 +25,33 @@ export function calculateDiffMinutes(targetTime: string, takenTime: string): num
   return diff;
 }
 
+/**
+ * 服薬実績ログから平均服用時刻（HH:mm）を算出（円周平均で日付跨ぎにも対応）
+ */
+export function calculateAverageTakenTime(logs: MedicationLog[]): string | null {
+  const takenTimes = logs
+    .map((l) => l.takenTime)
+    .filter((t): t is string => !!t);
+
+  if (takenTimes.length === 0) return null;
+
+  let sinSum = 0;
+  let cosSum = 0;
+
+  for (const t of takenTimes) {
+    const mins = timeToMinutes(t);
+    const rad = (mins / 1440) * 2 * Math.PI;
+    sinSum += Math.sin(rad);
+    cosSum += Math.cos(rad);
+  }
+
+  let avgRad = Math.atan2(sinSum / takenTimes.length, cosSum / takenTimes.length);
+  if (avgRad < 0) avgRad += 2 * Math.PI;
+
+  const avgMinutes = Math.round((avgRad / (2 * Math.PI)) * 1440) % 1440;
+  return minutesToTime(avgMinutes);
+}
+
 export function getDeviationStatus(diffMinutes: number | null): DeviationStatus {
   if (diffMinutes === null) {
     return {
@@ -39,10 +66,10 @@ export function getDeviationStatus(diffMinutes: number | null): DeviationStatus 
 
   const absDiff = Math.abs(diffMinutes);
 
-  if (absDiff <= 30) {
+  if (absDiff <= 25) {
     return {
       level: 'perfect',
-      label: 'ほぼ時間通り',
+      label: 'いつもの時間',
       colorClass: 'bg-emerald-100 text-emerald-800 border-emerald-200',
       badgeBg: 'bg-emerald-500 text-white',
       textColor: 'text-emerald-700',
@@ -51,9 +78,10 @@ export function getDeviationStatus(diffMinutes: number | null): DeviationStatus 
   }
 
   if (absDiff <= 60) {
+    const dirLabel = diffMinutes > 0 ? `少し遅め (+${diffMinutes}分)` : `少し早め (${diffMinutes}分)`;
     return {
       level: 'minor',
-      label: `少しズレ (${diffMinutes > 0 ? '+' : ''}${diffMinutes}分)`,
+      label: dirLabel,
       colorClass: 'bg-teal-100 text-teal-800 border-teal-200',
       badgeBg: 'bg-teal-500 text-white',
       textColor: 'text-teal-700',
@@ -61,13 +89,14 @@ export function getDeviationStatus(diffMinutes: number | null): DeviationStatus 
     };
   }
 
+  const dirLabel = diffMinutes > 0 ? `普段より遅め (+${diffMinutes}分)` : `普段より早め (${diffMinutes}分)`;
   return {
     level: 'moderate',
-    label: `時間のズレ (${diffMinutes > 0 ? '+' : ''}${diffMinutes}分)`,
-    colorClass: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-    badgeBg: 'bg-emerald-600 text-white',
-    textColor: 'text-emerald-800',
-    borderClass: 'border-emerald-200'
+    label: dirLabel,
+    colorClass: 'bg-amber-100 text-amber-800 border-amber-200',
+    badgeBg: 'bg-amber-500 text-white',
+    textColor: 'text-amber-800',
+    borderClass: 'border-amber-300'
   };
 }
 

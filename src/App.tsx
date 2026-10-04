@@ -8,7 +8,7 @@ import {
   getTodayDateString,
   getOrCreateLogForDate,
 } from './utils/storage';
-import { calculateDiffMinutes } from './utils/recommendation';
+import { calculateDiffMinutes, calculateAverageTakenTime } from './utils/recommendation';
 import { Header } from './components/Header';
 import { MainView } from './components/MainView';
 import { ResultView } from './components/ResultView';
@@ -25,7 +25,14 @@ export function App() {
   const [editingLog, setEditingLog] = useState<MedicationLog | null>(null);
 
   const todayDateStr = getTodayDateString(0);
-  const todayLog = getOrCreateLogForDate(todayDateStr, settings.targetTime, logs);
+  const averageTakenTime = calculateAverageTakenTime(logs);
+  const rawTodayLog = getOrCreateLogForDate(todayDateStr, settings.targetTime, logs);
+  const todayLog: MedicationLog = {
+    ...rawTodayLog,
+    diffMinutes: (rawTodayLog.takenTime && averageTakenTime)
+      ? calculateDiffMinutes(averageTakenTime, rawTodayLog.takenTime)
+      : rawTodayLog.diffMinutes,
+  };
 
   useEffect(() => {
     const exists = logs.some((l) => l.date === todayDateStr);
@@ -45,19 +52,20 @@ export function App() {
     setIsAlertDismissed(false);
   };
 
-  // 服薬「飲んだ！」アクション（設定された目標時間との実際のズレ分を計算）
+  // 服薬「飲んだ！」アクション（普段飲む時間との差分を計算）
   const handleTakeNow = () => {
     const now = new Date();
     const hh = String(now.getHours()).padStart(2, '0');
     const mm = String(now.getMinutes()).padStart(2, '0');
     const takenTimeStr = `${hh}:${mm}`;
 
-    // 設定目標時刻との差分（分）を正確に算出
-    const diffMinutes = calculateDiffMinutes(settings.targetTime, takenTimeStr);
+    // 普段飲む時間（実績の平均時刻）を基準にズレを算出
+    const baseTime = averageTakenTime || settings.targetTime;
+    const diffMinutes = calculateDiffMinutes(baseTime, takenTimeStr);
 
     const updatedLog: MedicationLog = {
       ...todayLog,
-      targetTime: settings.targetTime,
+      targetTime: baseTime,
       takenTime: takenTimeStr,
       takenAt: now.toISOString(),
       diffMinutes: diffMinutes,
@@ -168,11 +176,12 @@ export function App() {
         note: finalNote,
       };
     } else {
-      // 実際に指定された時間での偏差を算出
-      const diffMinutes = calculateDiffMinutes(settings.targetTime, takenTime);
+      // 普段飲む時間（実績の平均時刻）を基準にズレを算出
+      const baseTime = averageTakenTime || settings.targetTime;
+      const diffMinutes = calculateDiffMinutes(baseTime, takenTime);
       updatedLog = {
         ...targetLog,
-        targetTime: settings.targetTime,
+        targetTime: baseTime,
         takenTime: takenTime,
         takenAt: new Date().toISOString(),
         diffMinutes: diffMinutes,
