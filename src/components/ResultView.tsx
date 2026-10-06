@@ -1,6 +1,7 @@
 import React from 'react';
 import { MedicationLog, AppSettings, BleedingLevel, CustomMedicationItem } from '../types/medication';
 import { getDeviationStatus, calculateAverageTakenTime, calculateDiffMinutes } from '../utils/recommendation';
+import { RhythmChart } from './RhythmChart';
 import { Clock, ArrowLeft, Edit2, Pill, Activity, Sparkles, FileText } from 'lucide-react';
 
 interface ResultViewProps {
@@ -80,91 +81,79 @@ export const ResultView: React.FC<ResultViewProps> = ({
           <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
             服薬ログ・インサイト
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            日々の服薬リズムと体調の変化をスマートに分析
-          </p>
         </div>
       </div>
 
-      {/* サマリーKPIカード (Modern SaaS Bento Grid) */}
+      {/* サマリーKPIカード (Modern Bento Grid: 余計な注釈テキストを全廃) */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
         {/* ① 普段飲む時間 */}
         <div className="group relative bg-white rounded-2xl p-4 md:p-5 border border-slate-200/80 hover:border-emerald-300 shadow-xs hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 tracking-wide">普段飲む時間</span>
-            <div className="w-7 h-7 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 group-hover:scale-105 transition-transform">
-              <Clock className="w-3.5 h-3.5 stroke-[2.2]" />
+            <span className="text-sm font-bold text-slate-700 tracking-wide">普段飲む時間</span>
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 group-hover:scale-105 transition-transform">
+              <Clock className="w-4 h-4 stroke-[2.2]" />
             </div>
           </div>
-          <div className="mt-3 mb-1">
+          <div className="mt-3">
             {averageTakenTime ? (
               <div className="flex items-baseline space-x-1">
                 <span className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight font-mono">
                   {averageTakenTime}
                 </span>
-                <span className="text-xs font-bold text-slate-500">頃</span>
+                <span className="text-xs font-bold text-slate-400">頃</span>
               </div>
             ) : (
               <span className="text-base font-bold text-slate-400">記録なし</span>
             )}
-          </div>
-          <div className="mt-2 pt-2 border-t border-slate-100 flex items-center text-[11px] text-slate-500">
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
-            <span>{recentDaysCount > 0 ? `直近${recentDaysCount}日間の服薬平均` : '直近の服薬平均'}</span>
           </div>
         </div>
 
         {/* ② 飲む時間のズレ */}
         <div className="group relative bg-white rounded-2xl p-4 md:p-5 border border-slate-200/80 hover:border-teal-300 shadow-xs hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 tracking-wide">飲む時間のズレ</span>
-            <div className="w-7 h-7 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center border border-teal-100 group-hover:scale-105 transition-transform">
-              <Sparkles className="w-3.5 h-3.5 stroke-[2.2]" />
+            <span className="text-sm font-bold text-slate-700 tracking-wide">飲む時間のズレ</span>
+            <div className="w-8 h-8 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center border border-teal-100 group-hover:scale-105 transition-transform">
+              <Sparkles className="w-4 h-4 stroke-[2.2]" />
             </div>
           </div>
-          <div className="mt-3 mb-1">
+          <div className="mt-3">
             {recentDaysCount === 0 || !averageTakenTime ? (
               <span className="text-base font-bold text-slate-400">記録なし</span>
             ) : averageDiffMinutes === 0 ? (
               <span className="text-xl md:text-2xl font-black text-teal-700 tracking-tight">ほぼピッタリ</span>
             ) : (
               <div className="flex items-baseline space-x-0.5">
-                <span className="text-xs font-bold text-slate-500 mr-0.5">約</span>
+                <span className="text-xs font-bold text-slate-400 mr-0.5">約</span>
                 <span className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight font-mono">
                   {averageDiffMinutes}
                 </span>
-                <span className="text-xs font-bold text-slate-500">分</span>
+                <span className="text-xs font-bold text-slate-400">分</span>
               </div>
             )}
           </div>
-          <div className="mt-2 pt-2 border-t border-slate-100 flex items-center text-[11px] text-slate-500">
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-teal-500 mr-1.5"></span>
-            <span>普段の時間との差（平均）</span>
-          </div>
         </div>
 
-        {/* ③ 体調メモ・症状 */}
+        {/* ③ 体調記録日数 */}
         <div className="group relative bg-white rounded-2xl p-4 md:p-5 border border-slate-200/80 hover:border-amber-300 shadow-xs hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500 tracking-wide">体調記録日数</span>
-            <div className="w-7 h-7 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100 group-hover:scale-105 transition-transform">
-              <FileText className="w-3.5 h-3.5 stroke-[2.2]" />
+            <span className="text-sm font-bold text-slate-700 tracking-wide">体調記録日数</span>
+            <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100 group-hover:scale-105 transition-transform">
+              <FileText className="w-4 h-4 stroke-[2.2]" />
             </div>
           </div>
-          <div className="mt-3 mb-1">
+          <div className="mt-3">
             <div className="flex items-baseline space-x-1">
               <span className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight font-mono">
                 {bleedingDaysCount}
               </span>
-              <span className="text-xs font-bold text-slate-500">日</span>
+              <span className="text-xs font-bold text-slate-400">日</span>
             </div>
-          </div>
-          <div className="mt-2 pt-2 border-t border-slate-100 flex items-center text-[11px] text-slate-500">
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5"></span>
-            <span>気になった体調の記録合計</span>
           </div>
         </div>
       </div>
+
+      {/* 服薬リズム推移グラフ */}
+      <RhythmChart logs={logs} averageTakenTime={averageTakenTime} />
 
       {/* 本日の体調メモ入力カード (Craft / Notion風) */}
       {todayLog && onSetNote && (
@@ -174,10 +163,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
               <div className="w-7 h-7 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center border border-slate-200/60">
                 <FileText className="w-3.5 h-3.5" />
               </div>
-              <div>
-                <h3 className="text-xs font-bold text-slate-800">本日の体調メモ</h3>
-                <p className="text-[11px] text-slate-400">頭痛、胃痛、だるさなど気になった体調を記録</p>
-              </div>
+              <h3 className="text-sm font-bold text-slate-800">本日の体調メモ</h3>
             </div>
             <span className="text-xs font-semibold text-slate-600 bg-slate-100/90 border border-slate-200/60 px-2.5 py-1 rounded-lg">
               {formatDateLabel(todayLog.date)}
@@ -193,20 +179,15 @@ export const ResultView: React.FC<ResultViewProps> = ({
         </div>
       )}
 
-      {/* 服薬ログ一覧セクションヘッダー */}
+      {/* 服薬ログ一覧セクションヘッダー (余計な凡例を全廃) */}
       <div className="flex items-center justify-between pt-1">
         <div className="flex items-center space-x-2">
           <h2 className="text-sm font-bold text-slate-900 tracking-tight">
             服薬ログ一覧
           </h2>
-          <span className="text-[11px] font-bold text-slate-500 bg-slate-100 border border-slate-200/60 px-2 py-0.5 rounded-full font-mono">
+          <span className="text-xs font-bold text-slate-600 bg-slate-100 border border-slate-200/60 px-2 py-0.5 rounded-full font-mono">
             {sortedLogs.length}件
           </span>
-        </div>
-        <div className="hidden sm:flex items-center space-x-3 text-[11px] text-slate-500 font-medium">
-          <span className="flex items-center"><span className="w-2 h-2 rounded-full bg-emerald-500 inline-block mr-1"></span>いつもの時間 (±25分)</span>
-          <span className="flex items-center"><span className="w-2 h-2 rounded-full bg-teal-500 inline-block mr-1"></span>少し早め/遅め</span>
-          <span className="flex items-center"><span className="w-2 h-2 rounded-full bg-amber-500 inline-block mr-1"></span>普段と差</span>
         </div>
       </div>
 
@@ -252,13 +233,13 @@ export const ResultView: React.FC<ResultViewProps> = ({
 
                   <div className="flex items-center space-x-1.5">
                     {bleedingBadge && (
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border flex items-center space-x-1 ${bleedingBadge.bgClass}`}>
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-md border flex items-center space-x-1 ${bleedingBadge.bgClass}`}>
                         <Activity className="w-3 h-3" />
                         <span>{bleedingBadge.label}</span>
                       </span>
                     )}
 
-                    <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full border ${status.colorClass}`}>
+                    <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full border ${status.colorClass}`}>
                       {status.label}
                     </span>
                     <button
@@ -281,7 +262,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
                   </div>
 
                   {isTaken && diff !== null && (
-                    <span className="text-[11px] font-mono font-semibold text-slate-500">
+                    <span className="text-xs font-mono font-semibold text-slate-500">
                       {diff === 0 ? 'ピッタリ' : (diff > 0 ? `+${diff}分` : `${diff}分`)}
                     </span>
                   )}
@@ -302,7 +283,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
                             <Sparkles className="w-3 h-3 text-emerald-600" />
                             <span>{itemName}</span>
                           </span>
-                          <span className="font-mono text-[11px] font-bold text-emerald-700">
+                          <span className="font-mono text-xs font-bold text-emerald-700">
                             {time} 服用
                           </span>
                         </div>
@@ -317,7 +298,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
                           <Pill className="w-3 h-3 text-emerald-600" />
                           <span>朝食後の追加薬</span>
                         </span>
-                        <span className="font-mono text-[11px] font-bold text-emerald-700">
+                        <span className="font-mono text-xs font-bold text-emerald-700">
                           {log.extraTakenTime} 服用
                         </span>
                       </div>
@@ -330,7 +311,7 @@ export const ResultView: React.FC<ResultViewProps> = ({
                 {/* 体調メモ表示 */}
                 {hasNote && (
                   <div className="bg-amber-50/60 border border-amber-200/60 rounded-xl p-2.5 space-y-1">
-                    <div className="flex items-center space-x-1.5 text-amber-800 font-bold text-[11px]">
+                    <div className="flex items-center space-x-1.5 text-amber-800 font-bold text-xs">
                       <FileText className="w-3 h-3 text-amber-600 shrink-0" />
                       <span>体調メモ</span>
                     </div>
