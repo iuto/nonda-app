@@ -73,10 +73,10 @@ export function getDeviationStatus(diffMinutes: number | null): DeviationStatus 
     return {
       level: 'perfect',
       label: 'いつもの時間',
-      colorClass: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+      colorClass: 'bg-emerald-50 text-emerald-700 border-emerald-200/70',
       badgeBg: 'bg-emerald-500 text-white',
       textColor: 'text-emerald-700',
-      borderClass: 'border-emerald-300'
+      borderClass: 'border-emerald-200'
     };
   }
 
@@ -85,10 +85,10 @@ export function getDeviationStatus(diffMinutes: number | null): DeviationStatus 
     return {
       level: 'minor',
       label: dirLabel,
-      colorClass: 'bg-teal-100 text-teal-800 border-teal-200',
+      colorClass: 'bg-teal-50 text-teal-700 border-teal-200/70',
       badgeBg: 'bg-teal-500 text-white',
       textColor: 'text-teal-700',
-      borderClass: 'border-teal-300'
+      borderClass: 'border-teal-200'
     };
   }
 
@@ -96,10 +96,10 @@ export function getDeviationStatus(diffMinutes: number | null): DeviationStatus 
   return {
     level: 'moderate',
     label: dirLabel,
-    colorClass: 'bg-amber-100 text-amber-800 border-amber-200',
+    colorClass: 'bg-amber-50 text-amber-700 border-amber-200/70',
     badgeBg: 'bg-amber-500 text-white',
-    textColor: 'text-amber-800',
-    borderClass: 'border-amber-300'
+    textColor: 'text-amber-700',
+    borderClass: 'border-amber-200'
   };
 }
 

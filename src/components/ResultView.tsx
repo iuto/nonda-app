@@ -1,7 +1,7 @@
 import React from 'react';
 import { MedicationLog, AppSettings, BleedingLevel, CustomMedicationItem } from '../types/medication';
 import { getDeviationStatus, calculateAverageTakenTime, calculateDiffMinutes } from '../utils/recommendation';
-import { Calendar, Clock, ArrowLeft, Edit2, Pill, Activity, Sparkles, FileText } from 'lucide-react';
+import { Clock, ArrowLeft, Edit2, Pill, Activity, Sparkles, FileText } from 'lucide-react';
 
 interface ResultViewProps {
   logs: MedicationLog[];
@@ -55,11 +55,11 @@ export const ResultView: React.FC<ResultViewProps> = ({
     const activeLevel = level ?? (legacyHasBleeding ? 'light' : 'none');
     switch (activeLevel) {
       case 'light':
-        return { label: '体調: レベル1', bgClass: 'bg-orange-100 text-orange-800 border-orange-300' };
+        return { label: '体調: レベル1', bgClass: 'bg-orange-50 text-orange-700 border-orange-200/80' };
       case 'moderate':
-        return { label: '体調: レベル2', bgClass: 'bg-orange-400 text-white border-orange-500' };
+        return { label: '体調: レベル2', bgClass: 'bg-orange-500 text-white border-orange-600' };
       case 'heavy':
-        return { label: '体調: レベル3', bgClass: 'bg-orange-500 text-white border-orange-600' };
+        return { label: '体調: レベル3', bgClass: 'bg-rose-500 text-white border-rose-600' };
       default:
         return null;
     }
@@ -67,295 +67,284 @@ export const ResultView: React.FC<ResultViewProps> = ({
 
   return (
     <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8 space-y-6">
-      {/* 画面ヘッダー */}
-      <div className="flex items-center justify-between">
-        <button
-          onClick={onBackToMain}
-          className="text-xs font-semibold text-emerald-800 bg-white border border-emerald-200 px-3.5 py-2 rounded-xl flex items-center space-x-1.5 hover:bg-emerald-50 transition-colors shadow-xs"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          <span>メインへ戻る</span>
-        </button>
-        <h2 className="text-base md:text-lg font-bold text-slate-800">
-          詳細・服薬履歴
-        </h2>
-        <div className="w-20"></div>
+      {/* 画面ヘッダー (Linear / Vercel風) */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-slate-200/60">
+        <div>
+          <button
+            onClick={onBackToMain}
+            className="group inline-flex items-center text-xs font-semibold text-slate-500 hover:text-emerald-700 transition-colors mb-2 space-x-1.5"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
+            <span>ホームへ戻る</span>
+          </button>
+          <h1 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
+            服薬ログ・インサイト
+          </h1>
+          <p className="text-xs text-slate-500 mt-0.5">
+            日々の服薬リズムと体調の変化をスマートに分析
+          </p>
+        </div>
       </div>
 
-      {/* サマリーカード */}
-      <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-4 md:p-6 border border-emerald-100/90 shadow-sm shadow-emerald-500/5 grid grid-cols-3 gap-2.5 md:gap-4">
-        {/* ① 普段飲む時間カード */}
-        <div className="relative overflow-hidden rounded-2xl p-3 md:p-4 bg-gradient-to-b from-emerald-50/90 via-emerald-50/30 to-white border border-emerald-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[11px] md:text-xs font-bold text-emerald-800 flex items-center space-x-1.5">
-              <span className="w-5 h-5 md:w-6 md:h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                <Clock className="w-3 h-3 md:w-3.5 md:h-3.5 stroke-[2.4]" />
-              </span>
-              <span className="truncate">普段飲む時間</span>
-            </span>
+      {/* サマリーKPIカード (Modern SaaS Bento Grid) */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+        {/* ① 普段飲む時間 */}
+        <div className="group relative bg-white rounded-2xl p-4 md:p-5 border border-slate-200/80 hover:border-emerald-300 shadow-xs hover:shadow-md transition-all duration-200">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-500 tracking-wide">普段飲む時間</span>
+            <div className="w-7 h-7 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 group-hover:scale-105 transition-transform">
+              <Clock className="w-3.5 h-3.5 stroke-[2.2]" />
+            </div>
           </div>
-
-          <div className="my-1 text-center">
+          <div className="mt-3 mb-1">
             {averageTakenTime ? (
-              <div className="flex items-baseline justify-center space-x-0.5">
-                <span className="text-xl md:text-3xl font-black text-slate-800 tracking-tight">
+              <div className="flex items-baseline space-x-1">
+                <span className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight font-mono">
                   {averageTakenTime}
                 </span>
-                <span className="text-[10px] md:text-xs font-bold text-emerald-700">頃</span>
+                <span className="text-xs font-bold text-slate-500">頃</span>
               </div>
             ) : (
-              <span className="text-sm md:text-base font-bold text-slate-400">記録なし</span>
+              <span className="text-base font-bold text-slate-400">記録なし</span>
             )}
           </div>
-
-          <div className="mt-1.5 pt-1.5 border-t border-emerald-100/70 text-center">
-            <span className="text-[10px] md:text-[11px] font-medium text-emerald-700/80 truncate block">
-              {recentDaysCount > 0 ? `直近${recentDaysCount}日間の平均服薬時刻` : '直近の平均服薬時刻'}
-            </span>
+          <div className="mt-2 pt-2 border-t border-slate-100 flex items-center text-[11px] text-slate-500">
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+            <span>{recentDaysCount > 0 ? `直近${recentDaysCount}日間の服薬平均` : '直近の服薬平均'}</span>
           </div>
         </div>
 
-        {/* ② 飲む時間のズレ カード */}
-        <div className="relative overflow-hidden rounded-2xl p-3 md:p-4 bg-gradient-to-b from-teal-50/90 via-teal-50/30 to-white border border-teal-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[11px] md:text-xs font-bold text-teal-800 flex items-center space-x-1.5">
-              <span className="w-5 h-5 md:w-6 md:h-6 rounded-lg bg-teal-100 text-teal-700 flex items-center justify-center shrink-0">
-                <Sparkles className="w-3 h-3 md:w-3.5 md:h-3.5 stroke-[2.4]" />
-              </span>
-              <span className="truncate">飲む時間のズレ</span>
-            </span>
-          </div>
-
-          <div className="my-1 text-center">
-            {recentDaysCount === 0 || !averageTakenTime ? (
-              <span className="text-sm md:text-base font-bold text-slate-400">記録なし</span>
-            ) : averageDiffMinutes === 0 ? (
-              <span className="text-lg md:text-2xl font-black text-teal-800">ほぼピッタリ</span>
-            ) : (
-              <div className="flex items-baseline justify-center space-x-0.5">
-                <span className="text-[10px] md:text-xs font-bold text-teal-700 mr-0.5">約</span>
-                <span className="text-xl md:text-3xl font-black text-slate-800 tracking-tight">
-                  {averageDiffMinutes}
-                </span>
-                <span className="text-[10px] md:text-xs font-bold text-teal-700">分</span>
-              </div>
-            )}
-          </div>
-
-          <div className="mt-1.5 pt-1.5 border-t border-teal-100/70 text-center">
-            <span className="text-[10px] md:text-[11px] font-medium text-teal-700/80 truncate block">
-              普段の時間との差（平均）
-            </span>
-          </div>
-        </div>
-
-        {/* ③ 体調メモ・症状カード */}
-        <div className="relative overflow-hidden rounded-2xl p-3 md:p-4 bg-gradient-to-b from-amber-50/90 via-orange-50/30 to-white border border-amber-200/70 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-[11px] md:text-xs font-bold text-amber-900 flex items-center space-x-1.5">
-              <span className="w-5 h-5 md:w-6 md:h-6 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
-                <FileText className="w-3 h-3 md:w-3.5 md:h-3.5 stroke-[2.4]" />
-              </span>
-              <span className="truncate">体調メモ・症状</span>
-            </span>
-          </div>
-
-          <div className="my-1 text-center">
-            <div className="flex items-baseline justify-center space-x-0.5">
-              <span className="text-xl md:text-3xl font-black text-slate-800 tracking-tight">
-                {bleedingDaysCount}
-              </span>
-              <span className="text-[10px] md:text-xs font-bold text-amber-800">日</span>
+        {/* ② 飲む時間のズレ */}
+        <div className="group relative bg-white rounded-2xl p-4 md:p-5 border border-slate-200/80 hover:border-teal-300 shadow-xs hover:shadow-md transition-all duration-200">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-500 tracking-wide">飲む時間のズレ</span>
+            <div className="w-7 h-7 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center border border-teal-100 group-hover:scale-105 transition-transform">
+              <Sparkles className="w-3.5 h-3.5 stroke-[2.2]" />
             </div>
           </div>
+          <div className="mt-3 mb-1">
+            {recentDaysCount === 0 || !averageTakenTime ? (
+              <span className="text-base font-bold text-slate-400">記録なし</span>
+            ) : averageDiffMinutes === 0 ? (
+              <span className="text-xl md:text-2xl font-black text-teal-700 tracking-tight">ほぼピッタリ</span>
+            ) : (
+              <div className="flex items-baseline space-x-0.5">
+                <span className="text-xs font-bold text-slate-500 mr-0.5">約</span>
+                <span className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight font-mono">
+                  {averageDiffMinutes}
+                </span>
+                <span className="text-xs font-bold text-slate-500">分</span>
+              </div>
+            )}
+          </div>
+          <div className="mt-2 pt-2 border-t border-slate-100 flex items-center text-[11px] text-slate-500">
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-teal-500 mr-1.5"></span>
+            <span>普段の時間との差（平均）</span>
+          </div>
+        </div>
 
-          <div className="mt-1.5 pt-1.5 border-t border-amber-100/80 text-center">
-            <span className="text-[10px] md:text-[11px] font-medium text-amber-800/80 truncate block">
-              記録をつけた合計日数
-            </span>
+        {/* ③ 体調メモ・症状 */}
+        <div className="group relative bg-white rounded-2xl p-4 md:p-5 border border-slate-200/80 hover:border-amber-300 shadow-xs hover:shadow-md transition-all duration-200">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-500 tracking-wide">体調記録日数</span>
+            <div className="w-7 h-7 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100 group-hover:scale-105 transition-transform">
+              <FileText className="w-3.5 h-3.5 stroke-[2.2]" />
+            </div>
+          </div>
+          <div className="mt-3 mb-1">
+            <div className="flex items-baseline space-x-1">
+              <span className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight font-mono">
+                {bleedingDaysCount}
+              </span>
+              <span className="text-xs font-bold text-slate-500">日</span>
+            </div>
+          </div>
+          <div className="mt-2 pt-2 border-t border-slate-100 flex items-center text-[11px] text-slate-500">
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5"></span>
+            <span>気になった体調の記録合計</span>
           </div>
         </div>
       </div>
 
-      {/* 本日の体調メモ入力カード */}
+      {/* 本日の体調メモ入力カード (Craft / Notion風) */}
       {todayLog && onSetNote && (
-        <div className="bg-white rounded-3xl p-5 border border-amber-200/90 shadow-sm space-y-3 ring-1 ring-amber-100">
+        <div className="bg-white rounded-2xl p-4 md:p-5 border border-slate-200/80 shadow-xs space-y-3 focus-within:border-emerald-400 focus-within:ring-2 focus-within:ring-emerald-500/10 transition-all">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2.5">
-              <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-200/70">
-                <FileText className="w-4 h-4" />
+              <div className="w-7 h-7 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center border border-slate-200/60">
+                <FileText className="w-3.5 h-3.5" />
               </div>
               <div>
-                <h3 className="text-xs font-bold text-slate-800">本日の体調メモを記録</h3>
-                <p className="text-[10px] text-slate-400">頭痛、吐き気、だるさなど気になった体調をリアルタイム保存</p>
+                <h3 className="text-xs font-bold text-slate-800">本日の体調メモ</h3>
+                <p className="text-[11px] text-slate-400">頭痛、胃痛、だるさなど気になった体調を記録</p>
               </div>
             </div>
-            <span className="text-xs font-bold text-amber-900 bg-amber-50 px-3 py-1 rounded-full border border-amber-200/80">
+            <span className="text-xs font-semibold text-slate-600 bg-slate-100/90 border border-slate-200/60 px-2.5 py-1 rounded-lg">
               {formatDateLabel(todayLog.date)}
             </span>
           </div>
           <textarea
             value={todayLog.note || ''}
             onChange={(e) => onSetNote(e.target.value)}
-            placeholder="本日の体調や症状をメモ（例: 朝から軽い頭痛、少し胃の不快感あり）"
+            placeholder="本日の体調や気になる症状をメモ（例: 朝から軽い頭痛、少し胃の不快感あり）"
             rows={2}
-            className="w-full text-xs p-3 rounded-2xl bg-amber-50/40 border border-amber-200/70 text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white resize-none"
+            className="w-full text-xs p-3 rounded-xl bg-slate-50/70 border border-slate-200/80 text-slate-800 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-emerald-400 transition-all resize-none leading-relaxed"
           />
         </div>
       )}
 
-      {/* 凡例ガイド */}
-      <div className="bg-white/80 rounded-2xl p-3.5 border border-emerald-100 text-xs text-slate-600 flex flex-wrap items-center justify-between gap-2">
-        <span className="font-semibold text-slate-700">凡例:</span>
-        <div className="flex items-center space-x-3 text-xs">
-          <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block mr-1.5"></span>いつもの時間 (±25分)</span>
-          <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-teal-500 inline-block mr-1.5"></span>少し早め/遅め</span>
-          <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-orange-400 inline-block mr-1.5"></span>体調変化記録</span>
-          <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-teal-600 inline-block mr-1.5"></span>💊 追加薬あり</span>
+      {/* 服薬ログ一覧セクションヘッダー */}
+      <div className="flex items-center justify-between pt-1">
+        <div className="flex items-center space-x-2">
+          <h2 className="text-sm font-bold text-slate-900 tracking-tight">
+            服薬ログ一覧
+          </h2>
+          <span className="text-[11px] font-bold text-slate-500 bg-slate-100 border border-slate-200/60 px-2 py-0.5 rounded-full font-mono">
+            {sortedLogs.length}件
+          </span>
+        </div>
+        <div className="hidden sm:flex items-center space-x-3 text-[11px] text-slate-500 font-medium">
+          <span className="flex items-center"><span className="w-2 h-2 rounded-full bg-emerald-500 inline-block mr-1"></span>いつもの時間 (±25分)</span>
+          <span className="flex items-center"><span className="w-2 h-2 rounded-full bg-teal-500 inline-block mr-1"></span>少し早め/遅め</span>
+          <span className="flex items-center"><span className="w-2 h-2 rounded-full bg-amber-500 inline-block mr-1"></span>普段と差</span>
         </div>
       </div>
 
-      {/* 日別ログ＆ズレ可視化リスト */}
-      <div className="space-y-3">
-        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">
-          服薬履歴・体調ログ
-        </h3>
+      {/* 服薬履歴カードリスト (Linear / Apple Health風) */}
+      {sortedLogs.length === 0 ? (
+        <div className="bg-white rounded-2xl p-8 text-center text-slate-400 text-xs border border-slate-200/80">
+          まだ服薬履歴がありません。「のんだ！」ボタンを押して記録をスタートしましょう！
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+          {sortedLogs.map((log) => {
+            const isTaken = !!log.takenTime;
+            const diff = (isTaken && averageTakenTime) ? calculateDiffMinutes(averageTakenTime, log.takenTime!) : null;
+            const status = isTaken ? getDeviationStatus(diff) : getDeviationStatus(null);
+            const bleedingBadge = getBleedingBadge(log.bleedingLevel, log.hasBleeding);
+            const isExtraTaken = !!log.extraTakenTime;
+            const hasNote = !!(log.note && log.note.trim() !== '');
 
-        {sortedLogs.length === 0 ? (
-          <div className="bg-white rounded-3xl p-8 text-center text-slate-400 text-xs border border-emerald-100">
-            まだ服薬履歴がありません。「のんだ！」ボタンを押して記録をスタートしましょう！
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-            {sortedLogs.map((log) => {
-              const isTaken = !!log.takenTime;
-              const diff = (isTaken && averageTakenTime) ? calculateDiffMinutes(averageTakenTime, log.takenTime!) : null;
-              const status = isTaken ? getDeviationStatus(diff) : getDeviationStatus(null);
-              const bleedingBadge = getBleedingBadge(log.bleedingLevel, log.hasBleeding);
-              const isExtraTaken = !!log.extraTakenTime;
-              const hasNote = !!(log.note && log.note.trim() !== '');
-
-              return (
-                <div
-                  key={log.id}
-                  className={`bg-white rounded-2xl p-4 border shadow-xs transition-all space-y-3 ${
-                    bleedingBadge || hasNote ? 'border-orange-200 ring-1 ring-orange-100' : 'border-slate-100 hover:border-emerald-200'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Calendar className="w-4 h-4 text-emerald-600" />
-                      <span className="font-bold text-sm text-slate-800">
-                        {formatDateLabel(log.date)}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center space-x-1.5">
-                      {bleedingBadge && (
-                        <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border flex items-center space-x-1 shadow-xs ${bleedingBadge.bgClass}`}>
-                          <Activity className="w-3 h-3" />
-                          <span>{bleedingBadge.label}</span>
-                        </span>
-                      )}
-
-                      <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${status.colorClass}`}>
-                        {status.label}
-                      </span>
-                      <button
-                        onClick={() => onEditLog(log)}
-                        className="text-slate-400 hover:text-emerald-700 p-1 rounded-lg hover:bg-slate-100 transition-colors"
-                        title="変更"
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+            return (
+              <div
+                key={log.id}
+                className={`bg-white rounded-2xl p-4 border shadow-xs hover:shadow-md transition-all space-y-3 ${
+                  bleedingBadge || hasNote
+                    ? 'border-amber-200/80 ring-1 ring-amber-50'
+                    : 'border-slate-200/80 hover:border-slate-300'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <div className={`w-2 h-2 rounded-full ${
+                      !isTaken
+                        ? 'bg-slate-300'
+                        : status.level === 'perfect'
+                        ? 'bg-emerald-500 ring-2 ring-emerald-100'
+                        : status.level === 'minor'
+                        ? 'bg-teal-500 ring-2 ring-teal-100'
+                        : 'bg-amber-500 ring-2 ring-amber-100'
+                    }`} />
+                    <span className="font-bold text-sm text-slate-900 tracking-tight">
+                      {formatDateLabel(log.date)}
+                    </span>
                   </div>
 
-                  <div className="flex flex-col space-y-1 text-xs text-slate-600 bg-slate-50 rounded-xl p-2.5">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-1.5">
-                        <Clock className="w-3.5 h-3.5 text-slate-400" />
-                        <span>服薬時刻: <strong className="text-emerald-800 text-sm font-bold">{log.takenTime || '未服用'}</strong></span>
-                      </div>
-                    </div>
+                  <div className="flex items-center space-x-1.5">
+                    {bleedingBadge && (
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md border flex items-center space-x-1 ${bleedingBadge.bgClass}`}>
+                        <Activity className="w-3 h-3" />
+                        <span>{bleedingBadge.label}</span>
+                      </span>
+                    )}
 
-                    {/* 追加のお薬・サプリログ */}
-                    {(() => {
-                      const entries = Object.entries(log.customLogs || {});
-                      if (entries.length > 0) {
-                        return entries.map(([itemId, time]) => {
-                          if (!time) return null;
-                          const itemObj = settings?.customItems?.find((i: CustomMedicationItem) => i.id === itemId);
-                          const savedName = log.customItemNames?.[itemId];
-                          const itemName = itemObj ? itemObj.name : (savedName || (itemId === 'extra-1' ? '朝食後の追加薬' : '追加のお薬・サプリ'));
-                          return (
-                            <div key={itemId} className="pt-1 border-t border-slate-200/60 flex items-center justify-between text-emerald-800 font-semibold">
-                              <span className="flex items-center space-x-1">
-                                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                                <span>{itemName}</span>
-                              </span>
-                              <span className="bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded-md text-[11px]">
-                                {time} 服用済み
-                              </span>
-                            </div>
-                          );
-                        });
-                      }
+                    <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full border ${status.colorClass}`}>
+                      {status.label}
+                    </span>
+                    <button
+                      onClick={() => onEditLog(log)}
+                      className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 transition-colors"
+                      title="変更"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
 
-                      if (isExtraTaken) {
-                        return (
-                          <div className="pt-1 border-t border-slate-200/60 flex items-center justify-between text-emerald-800 font-semibold">
-                            <span className="flex items-center space-x-1">
-                              <Pill className="w-3.5 h-3.5 text-emerald-600" />
-                              <span>朝食後の追加薬</span>
-                            </span>
-                            <span className="bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded-md text-[11px]">
-                              {log.extraTakenTime} 服用済み
-                            </span>
-                          </div>
-                        );
-                      }
-
-                      return null;
-                    })()}
+                <div className="flex items-center justify-between text-xs text-slate-600 bg-slate-50/80 rounded-xl px-3 py-2 border border-slate-100">
+                  <div className="flex items-center space-x-1.5">
+                    <Clock className="w-3.5 h-3.5 text-slate-400" />
+                    <span className="text-slate-500">服薬時刻:</span>
+                    <strong className={`font-mono font-bold text-sm ${isTaken ? 'text-slate-900' : 'text-slate-400 font-normal italic'}`}>
+                      {log.takenTime || '未服用'}
+                    </strong>
                   </div>
 
-                  {/* 体調メモ表示 */}
-                  {hasNote && (
-                    <div className="bg-amber-50/80 border border-amber-200/80 rounded-xl p-2.5 space-y-1">
-                      <div className="flex items-center space-x-1.5 text-amber-900 font-bold text-[11px]">
-                        <FileText className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                        <span>体調メモ</span>
-                      </div>
-                      <p className="text-xs text-slate-700 whitespace-pre-wrap pl-5 font-medium leading-relaxed">
-                        {log.note}
-                      </p>
-                    </div>
-                  )}
-
-                  {isTaken && (
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between text-[10px] text-slate-400">
-                        <span>状態</span>
-                        <span className={`font-bold ${status.textColor}`}>{status.label}</span>
-                      </div>
-                      <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden flex">
-                        <div className={`h-full rounded-full transition-all duration-500 ${
-                          status.level === 'perfect'
-                            ? 'bg-emerald-500 w-full'
-                            : status.level === 'minor'
-                            ? 'bg-teal-500 w-3/4'
-                            : 'bg-amber-400 w-1/2'
-                        }`}></div>
-                      </div>
-                    </div>
+                  {isTaken && diff !== null && (
+                    <span className="text-[11px] font-mono font-semibold text-slate-500">
+                      {diff === 0 ? 'ピッタリ' : (diff > 0 ? `+${diff}分` : `${diff}分`)}
+                    </span>
                   )}
                 </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+
+                {/* 追加のお薬・サプリログ */}
+                {(() => {
+                  const entries = Object.entries(log.customLogs || {});
+                  if (entries.length > 0) {
+                    return entries.map(([itemId, time]) => {
+                      if (!time) return null;
+                      const itemObj = settings?.customItems?.find((i: CustomMedicationItem) => i.id === itemId);
+                      const savedName = log.customItemNames?.[itemId];
+                      const itemName = itemObj ? itemObj.name : (savedName || (itemId === 'extra-1' ? '朝食後の追加薬' : '追加のお薬・サプリ'));
+                      return (
+                        <div key={itemId} className="flex items-center justify-between text-xs text-emerald-900 bg-emerald-50/60 rounded-xl px-3 py-1.5 border border-emerald-100/60">
+                          <span className="flex items-center space-x-1.5 font-medium">
+                            <Sparkles className="w-3 h-3 text-emerald-600" />
+                            <span>{itemName}</span>
+                          </span>
+                          <span className="font-mono text-[11px] font-bold text-emerald-700">
+                            {time} 服用
+                          </span>
+                        </div>
+                      );
+                    });
+                  }
+
+                  if (isExtraTaken) {
+                    return (
+                      <div className="flex items-center justify-between text-xs text-emerald-900 bg-emerald-50/60 rounded-xl px-3 py-1.5 border border-emerald-100/60">
+                        <span className="flex items-center space-x-1.5 font-medium">
+                          <Pill className="w-3 h-3 text-emerald-600" />
+                          <span>朝食後の追加薬</span>
+                        </span>
+                        <span className="font-mono text-[11px] font-bold text-emerald-700">
+                          {log.extraTakenTime} 服用
+                        </span>
+                      </div>
+                    );
+                  }
+
+                  return null;
+                })()}
+
+                {/* 体調メモ表示 */}
+                {hasNote && (
+                  <div className="bg-amber-50/60 border border-amber-200/60 rounded-xl p-2.5 space-y-1">
+                    <div className="flex items-center space-x-1.5 text-amber-800 font-bold text-[11px]">
+                      <FileText className="w-3 h-3 text-amber-600 shrink-0" />
+                      <span>体調メモ</span>
+                    </div>
+                    <p className="text-xs text-slate-700 whitespace-pre-wrap pl-4 font-normal leading-relaxed">
+                      {log.note}
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
+
