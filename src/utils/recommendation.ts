@@ -69,10 +69,10 @@ export function getDeviationStatus(diffMinutes: number | null): DeviationStatus 
 
   const absDiff = Math.abs(diffMinutes);
 
-  if (absDiff <= 25) {
+  if (absDiff <= 30) {
     return {
       level: 'perfect',
-      label: 'いつもの時間',
+      label: '問題なし',
       colorClass: 'bg-emerald-50 text-emerald-700 border-emerald-200/70',
       badgeBg: 'bg-emerald-500 text-white',
       textColor: 'text-emerald-700',

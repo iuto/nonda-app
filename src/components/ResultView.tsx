@@ -109,25 +109,37 @@ export const ResultView: React.FC<ResultViewProps> = ({
         </div>
 
         {/* ② 飲む時間のズレ */}
-        <div className="group relative bg-white rounded-2xl p-4 md:p-5 border border-slate-200/80 hover:border-teal-300 shadow-xs hover:shadow-md transition-all duration-200">
+        <div className="group relative bg-white rounded-2xl p-4 md:p-5 border border-slate-200/80 hover:border-emerald-300 shadow-xs hover:shadow-md transition-all duration-200">
           <div className="flex items-center justify-between">
             <span className="text-sm font-bold text-slate-700 tracking-wide">飲む時間のズレ</span>
-            <div className="w-8 h-8 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center border border-teal-100 group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100 group-hover:scale-105 transition-transform">
               <Sparkles className="w-4 h-4 stroke-[2.2]" />
             </div>
           </div>
           <div className="mt-3">
             {recentDaysCount === 0 || !averageTakenTime ? (
               <span className="text-base font-bold text-slate-400">記録なし</span>
-            ) : averageDiffMinutes === 0 ? (
-              <span className="text-xl md:text-2xl font-black text-teal-700 tracking-tight">ほぼピッタリ</span>
-            ) : (
-              <div className="flex items-baseline space-x-0.5">
-                <span className="text-xs font-bold text-slate-400 mr-0.5">約</span>
-                <span className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight font-mono">
-                  {averageDiffMinutes}
+            ) : averageDiffMinutes <= 30 ? (
+              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                <span className="text-2xl md:text-3xl font-black text-emerald-600 tracking-tight">
+                  問題なし
                 </span>
-                <span className="text-xs font-bold text-slate-400">分</span>
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/70 font-mono">
+                  {averageDiffMinutes === 0 ? 'ピッタリ (30分以内)' : `約${averageDiffMinutes}分ズレ (30分以内)`}
+                </span>
+              </div>
+            ) : (
+              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                <div className="flex items-baseline space-x-0.5">
+                  <span className="text-xs font-bold text-amber-500 mr-0.5">約</span>
+                  <span className="text-2xl md:text-3xl font-black text-amber-600 tracking-tight font-mono">
+                    {averageDiffMinutes}
+                  </span>
+                  <span className="text-xs font-bold text-amber-500">分ズレ</span>
+                </div>
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200/70 font-mono">
+                  普段よりズレあり
+                </span>
               </div>
             )}
           </div>

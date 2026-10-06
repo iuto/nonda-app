@@ -122,9 +122,9 @@ export const RhythmChart: React.FC<RhythmChartProps> = ({ logs, averageTakenTime
           </div>
           <h2 className="text-sm font-bold text-slate-800">服薬リズム推移</h2>
         </div>
-        <div className="flex items-center space-x-1.5 text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200/60">
+        <div className="flex items-center space-x-1.5 text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/70">
           <Clock className="w-3 h-3 text-emerald-600 mr-0.5" />
-          <span>いつもの時間: {averageTakenTime}</span>
+          <span>いつもの時間: {averageTakenTime} (±30分以内は問題なし)</span>
         </div>
       </div>
 
@@ -146,6 +146,48 @@ export const RhythmChart: React.FC<RhythmChartProps> = ({ logs, averageTakenTime
               <feDropShadow dx="0" dy="1.5" stdDeviation="1.5" floodColor="#0f172a" floodOpacity="0.12" />
             </filter>
           </defs>
+
+          {/* ±30分以内（問題なしエリア）の許容帯域 */}
+          <rect
+            x={padLeft}
+            y={getY(30)}
+            width={chartWidth}
+            height={getY(-30) - getY(30)}
+            fill="#10b981"
+            fillOpacity="0.05"
+            rx="4"
+          />
+          <line
+            x1={padLeft}
+            y1={getY(30)}
+            x2={svgWidth - padRight}
+            y2={getY(30)}
+            stroke="#10b981"
+            strokeDasharray="2 3"
+            strokeWidth="1"
+            strokeOpacity="0.35"
+          />
+          <line
+            x1={padLeft}
+            y1={getY(-30)}
+            x2={svgWidth - padRight}
+            y2={getY(-30)}
+            stroke="#10b981"
+            strokeDasharray="2 3"
+            strokeWidth="1"
+            strokeOpacity="0.35"
+          />
+          <text
+            x={svgWidth - padRight - 6}
+            y={getY(30) + 11}
+            textAnchor="end"
+            fill="#059669"
+            fontSize="9.5"
+            fontWeight="700"
+            fillOpacity="0.75"
+          >
+            30分以内 (問題なし)
+          </text>
 
           {/* 上部補助線 (+limitDiff) */}
           <line
@@ -237,11 +279,11 @@ export const RhythmChart: React.FC<RhythmChartProps> = ({ logs, averageTakenTime
             const isTaken = p.isTaken && p.diff !== null && p.takenTime;
             const y = isTaken ? getY(p.diff!) : yCenter;
 
-            // ズレに応じた色
+            // ズレに応じた色 (30分以内なら問題なし = 緑)
             const absDiff = isTaken ? Math.abs(p.diff!) : 0;
             const pointColor = !isTaken
               ? '#cbd5e1'
-              : absDiff <= 25
+              : absDiff <= 30
               ? '#10b981'
               : absDiff <= 60
               ? '#0d9488'
