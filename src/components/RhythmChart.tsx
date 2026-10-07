@@ -143,7 +143,7 @@ export const RhythmChart: React.FC<RhythmChartProps> = ({ logs, averageTakenTime
             </linearGradient>
             {/* シャドウフィルター */}
             <filter id="badgeShadow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="1.5" stdDeviation="1.5" floodColor="#0f172a" floodOpacity="0.12" />
+              <feDropShadow dx="0" dy="1" stdDeviation="1.5" floodColor="#0f172a" floodOpacity="0.08" />
             </filter>
           </defs>
 
@@ -323,22 +323,24 @@ export const RhythmChart: React.FC<RhythmChartProps> = ({ logs, averageTakenTime
                       fill={pointColor}
                     />
 
-                    {/* 時刻バッジ（ダークピル） */}
+                    {/* 時刻バッジ（クリーンホワイトピル: 黒色を廃止し白背景＋テーマ枠＋テキストへ） */}
                     <g filter="url(#badgeShadow)">
                       <rect
-                        x={x - 24}
+                        x={x - 23}
                         y={y - 25}
-                        width="48"
-                        height="17"
+                        width={46}
+                        height={17}
                         rx="5"
-                        fill="#0f172a"
+                        fill="#ffffff"
+                        stroke={pointColor}
+                        strokeWidth="1.2"
                       />
                       <text
                         x={x}
                         y={y - 13}
                         textAnchor="middle"
-                        fill="#ffffff"
-                        fontSize="10.5"
+                        fill={pointColor === '#10b981' ? '#047857' : pointColor === '#0d9488' ? '#0f766e' : '#b45309'}
+                        fontSize="10"
                         fontWeight="700"
                         fontFamily="monospace"
                       >
