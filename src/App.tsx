@@ -159,6 +159,15 @@ export function App() {
       updatePills(1);
     }
 
+    const wasExtraTaken = !!targetLog.extraTakenTime;
+    const willBeExtraTaken = extraTakenTime !== undefined && extraTakenTime !== null;
+
+    if (!wasExtraTaken && willBeExtraTaken) {
+      updatePills(-1);
+    } else if (wasExtraTaken && !willBeExtraTaken) {
+      updatePills(1);
+    }
+
     let updatedLog: MedicationLog;
 
     const finalLevel = bleedingLevel ?? targetLog.bleedingLevel ?? (targetLog.hasBleeding ? 'light' : 'none');
@@ -239,6 +248,7 @@ export function App() {
       if (itemId === 'extra-1') {
         extraTakenTime = null;
       }
+      updatePills(1);
     } else {
       const now = new Date();
       const hh = String(now.getHours()).padStart(2, '0');
@@ -249,6 +259,7 @@ export function App() {
       if (itemId === 'extra-1') {
         extraTakenTime = takenTimeStr;
       }
+      updatePills(-1);
     }
 
     const updatedLog: MedicationLog = {
