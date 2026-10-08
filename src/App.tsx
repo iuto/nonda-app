@@ -267,6 +267,38 @@ export function App() {
     saveLogs(newLogs);
   };
 
+  const handleUpdateCustomItemTime = (itemId: string, newTime: string) => {
+    const targetLog = logs.find((l) => l.date === todayDateStr) || getOrCreateLogForDate(todayDateStr, settings.targetTime, logs);
+    const currentCustomLogs = targetLog.customLogs || {};
+
+    const currentItems = settings.customItems || [{ id: 'extra-1', name: '朝食後の追加薬' }];
+    const itemObj = currentItems.find((i) => i.id === itemId);
+    const itemName = itemObj ? itemObj.name : (itemId === 'extra-1' ? '朝食後の追加薬' : '追加のお薬・サプリ');
+
+    const newCustomLogs = { ...currentCustomLogs, [itemId]: newTime };
+    const newCustomItemNames = { ...(targetLog.customItemNames || {}), [itemId]: itemName };
+
+    let extraTakenTime = targetLog.extraTakenTime;
+    if (itemId === 'extra-1') {
+      extraTakenTime = newTime;
+    }
+
+    const updatedLog: MedicationLog = {
+      ...targetLog,
+      extraTakenTime,
+      customLogs: newCustomLogs,
+      customItemNames: newCustomItemNames,
+    };
+
+    const exists = logs.some((l) => l.date === todayDateStr);
+    const newLogs = exists
+      ? logs.map((l) => (l.date === todayDateStr ? updatedLog : l))
+      : [updatedLog, ...logs];
+
+    setLogs(newLogs);
+    saveLogs(newLogs);
+  };
+
   const handleOpenEditForLog = (log: MedicationLog) => {
     setEditingLog(log);
     setIsEditModalOpen(true);
@@ -290,6 +322,7 @@ export function App() {
             onCancelTake={handleCancelTake}
             onSetBleedingLevel={(level) => handleSetBleedingLevel(todayDateStr, level)}
             onToggleCustomItem={handleToggleCustomItem}
+            onUpdateCustomItemTime={handleUpdateCustomItemTime}
             onAddCustomItem={handleAddCustomItem}
             onDeleteCustomItem={handleDeleteCustomItem}
             onSetRemainingPills={handleSetRemainingPills}

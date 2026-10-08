@@ -13,6 +13,7 @@ interface MainViewProps {
   onCancelTake: () => void;
   onSetBleedingLevel: (level: BleedingLevel) => void;
   onToggleCustomItem: (itemId: string) => void;
+  onUpdateCustomItemTime?: (itemId: string, newTime: string) => void;
   onAddCustomItem: (name: string) => void;
   onDeleteCustomItem: (itemId: string) => void;
   onSetRemainingPills: (count: number) => void;
@@ -29,6 +30,7 @@ export const MainView: React.FC<MainViewProps> = ({
   onCancelTake,
   onSetBleedingLevel,
   onToggleCustomItem,
+  onUpdateCustomItemTime,
   onAddCustomItem,
   onDeleteCustomItem,
   onSetRemainingPills,
@@ -396,12 +398,20 @@ export const MainView: React.FC<MainViewProps> = ({
                         </button>
                       ) : (
                         <div className="flex items-center space-x-1.5">
-                          <span className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-xl">
-                            {takenTime} 服用済み
-                          </span>
+                          {/* タップして時間を変更できるタイムピル */}
+                          <div className="relative inline-flex items-center" title="タップして時間を変更">
+                            <Clock className="w-3 h-3 text-emerald-600 absolute left-2 pointer-events-none" />
+                            <input
+                              type="time"
+                              value={takenTime}
+                              onChange={(e) => onUpdateCustomItemTime?.(item.id, e.target.value)}
+                              className="text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100/90 focus:bg-white border border-emerald-200/90 hover:border-emerald-300 focus:border-emerald-400 pl-6 pr-1.5 py-0.5 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono transition-all"
+                            />
+                          </div>
+                          <span className="text-[11px] text-emerald-700 font-semibold">服用済み</span>
                           <button
                             onClick={() => onToggleCustomItem(item.id)}
-                            className="text-[11px] text-slate-400 hover:text-rose-600 underline transition-colors"
+                            className="text-[11px] text-slate-400 hover:text-rose-600 underline transition-colors ml-0.5"
                           >
                             取り消す
                           </button>
